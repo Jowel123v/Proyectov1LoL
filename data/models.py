@@ -76,7 +76,7 @@ class Team(TableBase, table=True):
         back_populates="winner",
         sa_relationship_kwargs={"foreign_keys": "[MatchSummary.winner_id]"},
     )
-
+    players: List["Player"] = Relationship(back_populates="team")
 
 class MatchSummary(TableBase, table=True):
     __tablename__ = "matchsummary"
@@ -107,6 +107,24 @@ class MatchSummary(TableBase, table=True):
         back_populates="matches",
         link_model=MatchChampionLink,
     )
+
+# PLAYER MODELO
+
+class Player(TableBase, table=True):
+    __tablename__ = "player"
+
+    nickname: str = Field(index=True, min_length=1, max_length=50)
+    real_name: Optional[str] = Field(default=None, max_length=100)
+    role: str = Field(
+        min_length=2,
+        max_length=10,
+        description="Rol: TOP, JNG, MID, ADC, SUP",
+    )
+    country: Optional[str] = Field(default=None, max_length=50)
+
+    # Relación con Team
+    team_id: Optional[int] = Field(default=None, foreign_key="team.id")
+    team: Optional[Team] = Relationship(back_populates="players")
 
 
 __all__ = [

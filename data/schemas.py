@@ -88,3 +88,31 @@ class MatchChampionLinkIn(BaseModel):
     match_id: int
     champion_id: int
 
+# PLAYER (SCHEMAS)
+
+class PlayerBase(BaseModel):
+    nickname: str = Field(min_length=1, max_length=50)
+    real_name: Optional[str] = Field(default=None, max_length=100)
+    role: str = Field(
+        min_length=2,
+        max_length=10,
+        description="Rol: TOP, JNG, MID, ADC, SUP",
+    )
+    country: Optional[str] = Field(default=None, max_length=50)
+    team_id: Optional[int] = None
+
+
+class PlayerCreate(PlayerBase):
+    pass
+
+
+class PlayerUpdate(BaseModel):
+    nickname: Optional[str] = Field(default=None, min_length=1, max_length=50)
+    real_name: Optional[str] = Field(default=None, max_length=100)
+    role: Optional[str] = Field(default=None, min_length=2, max_length=10)
+    country: Optional[str] = Field(default=None, max_length=50)
+    team_id: Optional[int] = None
+
+
+class PlayerRead(PlayerBase):
+    id: int

@@ -8,6 +8,7 @@ from data.models import (
     Team,
     MatchSummary,
     MatchChampionLink,
+    Player,
 )
 
 
@@ -352,10 +353,6 @@ def filtrar_resumen_por_ganador(session: Session, team_id: int) -> List[MatchSum
         _handle_exception(session, e, "Error al filtrar resúmenes por ganador")
 
 
-
-# (Opcional) N:M utilities si las llegas a exponer como endpoints
-
-
 def obtener_campeones_de_match(session: Session, match_id: int) -> List[Champion]:
     """Campeones asociados a un match (solo activos)."""
     try:
@@ -365,3 +362,146 @@ def obtener_campeones_de_match(session: Session, match_id: int) -> List[Champion
         return [c for c in match.champions if not c.is_deleted]
     except SQLAlchemyError as e:
         _handle_exception(session, e, "Error al obtener campeones del match")
+
+# PLAYER
+
+def crear_jugador(session: Session, obj: Player) -> Dict[str, Any]:
+    try:
+        obj.id = None
+        session.add(obj)
+        session.commit()
+        session.refresh(obj)
+        return _created_payload(obj)  # sin id ni is_deleted
+    except SQLAlchemyError as e:
+        _handle_exception(session, e, "Error al crear el jugador")
+
+
+def listar_jugadores(
+    session: Session,
+    skip: int = 0,
+    limit: int = 10,
+    include_deleted: bool = False,
+) -> List[Player]:
+    try:
+        q = (
+            select(Player)
+            .where(_apply_active_filter(Player, include_deleted))
+            .offset(skip)
+            .limit(limit)
+        )
+        return session.exec(q).all()
+    except SQLAlchemyError as e:
+        _handle_exception(session, e, "Error al listar los jugadores")
+
+
+def listar_jugadores_eliminados(session: Session) -> List[Player]:
+    """Solo jugadores con is_deleted = True."""
+    try:
+        q = select(Player).where(Player.is_deleted == True)  # noqa: E712
+        return session.exec(q).all()
+    except SQLAlchemyError as e:
+        _handle_exception(session, e, "Error al listar jugadores eliminados")
+
+
+def obtener_jugador(session: Session, player_id: int) -> Player:
+    """Obtener un jugador por id (solo si no está eliminado)."""
+    try:
+        obj = session.get(Player, player_id)
+        if not obj or obj.is_deleted:
+            raise HTTPException(status_code=404, detail="Jugador no encontrado o eliminado")
+        return obj
+    except SQLAlchemyError as e:
+        _handle_exception(session, e, "Error al obtener jugador")
+
+
+def actualizar_jugador(session: Session, player_id: int, obj_update: Player) -> Player:
+    try:
+        db_obj = session.get(Player, player_id)
+        if not db_obj or db_obj.is_deleted:
+            raise HTTPException(status_code=404, detail="Jugador no encontrado o eliminado")
+
+        # Copiar campos uno a uno, ignorando id / is_deleted
+        update_data = obj_update.dict(exclude_unset=True, exclude={"id", "is_deleted"})
+        for field, value in update_data.items():
+            setattr(db_obj, field, value)
+
+        session.add(db_obj)
+        session.commit()
+        session.refresh(db_obj)
+        return db_obj
+    except SQLAlchemyError as e:
+        _handle_exception(session, e, "Error al actualizar jugador")
+
+
+def eliminar_jugador(session: Session, player_id: int) -> bool:
+    """Soft delete del jugador (is_deleted = True)."""
+    try:
+        obj = session.get(Player, player_id)
+        if not obj:
+            raise HTTPException(status_code=404, detail="Jugador no encontrado")
+        if obj.is_deleted:
+            raise HTTPException(status_code=400, detail="El jugador ya está eliminado")
+        obj.is_deleted = True
+        session.add(obj)
+        session.commit()
+        return True
+    except SQLAlchemyError as e:
+        _handle_exception(session, e, "Error al eliminar jugador (soft delete)")
+
+
+def restaurar_jugador(session: Session, player_id: int) -> bool:
+    """Revertir soft delete (is_deleted = False)."""
+    try:
+        obj = session.get(Player, player_id)
+        if not obj:
+            raise HTTPException(status_code=404, detail="Jugador no encontrado")
+        if not obj.is_deleted:
+            raise HTTPException(status_code=400, detail="El jugador no está eliminado")
+        obj.is_deleted = False
+        session.add(obj)
+        session.commit()
+        return True
+    except SQLAlchemyError as e:
+        _handle_exception(session, e, "Error al restaurar jugador")
+
+
+def buscar_jugadores_por_nickname(session: Session, nickname_query: str) -> List[Player]:
+    try:
+        if not nickname_query:
+            raise HTTPException(status_code=400, detail="Debe proporcionar un texto de búsqueda")
+
+        pattern = f"%{nickname_query}%"
+        q = select(Player).where(
+            Player.nickname.ilike(pattern),  # type: ignore[attr-defined]
+            Player.is_deleted == False,      # noqa: E712
+        )
+        return session.exec(q).all()
+    except SQLAlchemyError as e:
+        _handle_exception(session, e, "Error al buscar jugadores por nickname")
+
+
+def filtrar_jugadores_por_rol(session: Session, role: str) -> List[Player]:
+    """Filtrar jugadores por rol (TOP, JNG, MID, ADC, SUP, etc.)."""
+    try:
+        if not role:
+            raise HTTPException(status_code=400, detail="El rol no puede ser vacío")
+        q = select(Player).where(
+            Player.role == role,
+            Player.is_deleted == False,  # noqa: E712
+        )
+        return session.exec(q).all()
+    except SQLAlchemyError as e:
+        _handle_exception(session, e, "Error al filtrar jugadores por rol")
+
+
+def filtrar_jugadores_por_equipo(session: Session, team_id: int) -> List[Player]:
+    """Todos los jugadores activos de un equipo concreto."""
+    try:
+        q = select(Player).where(
+            Player.team_id == team_id,
+            Player.is_deleted == False,  # noqa: E712
+        )
+        return session.exec(q).all()
+    except SQLAlchemyError as e:
+        _handle_exception(session, e, "Error al filtrar jugadores por equipo")
+
