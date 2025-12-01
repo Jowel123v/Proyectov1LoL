@@ -1,6 +1,11 @@
 from typing import List
 from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlmodel import SQLModel, Session, create_engine
+from fastapi import FastAPI, Depends, HTTPException, Request, Query
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
+from db import get_session
 
 # Modelos
 from data.models import Champion, Team, MatchSummary, Player
@@ -49,6 +54,12 @@ app = FastAPI(
     version="1.1.1",
 )
 
+# Templates Jinja2
+templates = Jinja2Templates(directory="templates")
+
+# Archivos estáticos (CSS, imágenes, JS)
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 @app.on_event("startup")
 def on_startup():
     crear_db()
@@ -72,6 +83,26 @@ def root():
 def health():
     return {"status": "ok"}
 
+@app.get("/", response_class=HTMLResponse, tags=["Front"])
+def home(
+    request: Request,
+    session: Session = Depends(get_session),
+):
+    """
+    Página de inicio HTML.
+    Muestra un resumen básico de equipos y jugadores.
+    """
+    equipos = listar_equipos(session, skip=0, limit=50, include_deleted=False)
+    jugadores = listar_jugadores(session, skip=0, limit=50, include_deleted=False)
+
+    return templates.TemplateResponse(
+        "index.html",
+        {
+            "request": request,
+            "equipos": equipos,
+            "jugadores": jugadores,
+        },
+    )
 
 # CHAMPIONS  (orden: estáticas -> dinámicas)
 

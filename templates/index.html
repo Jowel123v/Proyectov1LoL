@@ -1,10 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block title %}Inicio · LoL Worlds{% endblock %}
+
+{% block content %}
+  <section class="hero">
+    <h1>Dashboard inicial LoL Worlds</h1>
+    <p>Explora equipos, jugadores y estadísticas básicas del torneo.</p>
+  </section>
+
+  <section class="grid">
+    <div class="card">
+      <h2>Equipos registrados</h2>
+      {% if equipos %}
+        <ul class="list">
+          {% for team in equipos %}
+            <li>
+              <strong>{{ team.name }}</strong> · {{ team.region }}
+              <br />
+              W: {{ team.wins }} · L: {{ team.losses }} · KDA: {{ "%.2f"|format(team.avg_kda) }}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No hay equipos registrados aún.</p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2>Jugadores registrados</h2>
+      {% if jugadores %}
+        <ul class="list">
+          {% for player in jugadores %}
+            <li>
+              <strong>{{ player.nickname }}</strong> ({{ player.role }})
+              {% if player.team %}
+                – Team: {{ player.team.name }}
+              {% endif %}
+              {% if player.country %}
+                · {{ player.country }}
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No hay jugadores registrados aún.</p>
+      {% endif %}
+    </div>
+  </section>
+{% endblock %}

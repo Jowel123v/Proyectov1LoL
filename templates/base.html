@@ -1,10 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+  <meta charset="UTF-8" />
+  <title>{% block title %}LoL Worlds Analytics{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="{{ url_for('static', path='/css/styles.css') }}" rel="stylesheet" />
 </head>
 <body>
+  <header class="navbar">
+    <div class="navbar-brand">
+      <span class="logo-text">LoL Worlds</span>
+    </div>
+    <nav class="navbar-menu">
+      <a href="{{ url_for('home') }}">Inicio</a>
+      <!-- luego podemos poner:
+      <a href="{{ url_for('teams_page') }}">Equipos</a>
+      <a href="{{ url_for('players_page') }}">Jugadores</a>
+      <a href="{{ url_for('dashboard_page') }}">Dashboard</a>
+      -->
+      <form action="{{ url_for('home') }}" method="get" class="navbar-search">
+        <input type="text" name="search" placeholder="Buscar jugador..." />
+        <button type="submit">Buscar</button>
+      </form>
+    </nav>
+  </header>
 
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <p>Proyecto LoL Worlds · FastAPI · {{ request.url.hostname }}</p>
+  </footer>
 </body>
 </html>
