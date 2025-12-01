@@ -3,7 +3,7 @@ from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlmodel import SQLModel, Session, create_engine
 
 # Modelos
-from data.models import Champion, Team, MatchSummary
+from data.models import Champion, Team, MatchSummary, Player
 
 # Operaciones (con soft delete, historial, restaurar, búsquedas y filtros)
 from operations.operations_db import (
