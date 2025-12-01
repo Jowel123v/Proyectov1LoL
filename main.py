@@ -20,6 +20,11 @@ from operations.operations_db import (
     # Matches
     crear_resumen, listar_resumenes, listar_resumenes_eliminados, restaurar_resumen,
     buscar_resumen_por_etapa, filtrar_resumen_por_ganador,
+
+    # Players
+    crear_jugador, listar_jugadores, listar_jugadores_eliminados, restaurar_jugador,
+    buscar_jugadores_por_nickname, filtrar_jugadores_por_rol, filtrar_jugadores_por_equipo,
+    obtener_jugador, actualizar_jugador, eliminar_jugador,
 )
 
 
@@ -172,7 +177,7 @@ def eliminar_equipo_por_id(team_id: int, session: Session = Depends(get_session)
     raise HTTPException(status_code=404, detail="Equipo no encontrado")
 
 
-# MATCHES  (orden: estáticas -> dinámicas)
+# MATCHES
 
 @app.post("/matches/", response_model=MatchSummary, tags=["Matches"])
 def crear_nueva_partida(obj: MatchSummary, session: Session = Depends(get_session)):
@@ -208,3 +213,80 @@ def filtrar_partidas_por_ganador(team_id: int, session: Session = Depends(get_se
     if not partidas:
         raise HTTPException(status_code=404, detail="No se encontraron partidas ganadas por este equipo")
     return partidas
+
+
+# PLAYERS
+
+@app.post("/players/", response_model=Player, tags=["Players"])
+def crear_nuevo_jugador(obj: Player, session: Session = Depends(get_session)):
+    return crear_jugador(session, obj)
+
+
+@app.get("/players/", response_model=List[Player], tags=["Players"])
+def listar_todos_los_jugadores(
+    skip: int = 0,
+    limit: int = Query(10, le=100),
+    include_deleted: bool = Query(False, description="Incluir eliminados lógicamente"),
+    session: Session = Depends(get_session),
+):
+    return listar_jugadores(session, skip=skip, limit=limit, include_deleted=include_deleted)
+
+@app.get("/players/deleted", response_model=List[Player], tags=["Players"])
+def listar_jugadores_borrados(session: Session = Depends(get_session)):
+    """Lista solo los jugadores con soft delete (is_deleted = True)."""
+    return listar_jugadores_eliminados(session)
+
+
+@app.post("/players/{player_id}/restore", tags=["Players"])
+def restaurar_jugador_por_id(player_id: int, session: Session = Depends(get_session)):
+    """Restaura un jugador eliminado (is_deleted pasa a False)."""
+    if restaurar_jugador(session, player_id):
+        return {"message": "Jugador restaurado correctamente"}
+    raise HTTPException(status_code=404, detail="No fue posible restaurar el jugador")
+
+
+@app.get("/players/search/", response_model=List[Player], tags=["Players"])
+def buscar_jugadores(
+    nickname: str = Query(..., min_length=1),
+    session: Session = Depends(get_session),
+):
+    return buscar_jugadores_por_nickname(session, nickname)
+
+
+@app.get("/players/role/{role}", response_model=List[Player], tags=["Players"])
+def filtrar_jugadores_por_role(role: str, session: Session = Depends(get_session)):
+    jugadores = filtrar_jugadores_por_rol(session, role)
+    if not jugadores:
+        raise HTTPException(status_code=404, detail="No se encontraron jugadores para ese rol")
+    return jugadores
+
+
+@app.get("/players/team/{team_id}", response_model=List[Player], tags=["Players"])
+def filtrar_jugadores_por_team(team_id: int, session: Session = Depends(get_session)):
+    jugadores = filtrar_jugadores_por_equipo(session, team_id)
+    if not jugadores:
+        raise HTTPException(status_code=404, detail="No se encontraron jugadores para ese equipo")
+    return jugadores
+
+
+# --- RUTAS CON PARÁMETRO (CRUD por id)
+
+@app.get("/players/{player_id}", response_model=Player, tags=["Players"])
+def obtener_jugador_por_id(player_id: int, session: Session = Depends(get_session)):
+    return obtener_jugador(session, player_id)
+
+
+@app.put("/players/{player_id}", response_model=Player, tags=["Players"])
+def actualizar_datos_jugador(
+    player_id: int,
+    obj: Player,
+    session: Session = Depends(get_session),
+):
+    return actualizar_jugador(session, player_id, obj)
+
+
+@app.delete("/players/{player_id}", tags=["Players"])
+def eliminar_jugador_por_id(player_id: int, session: Session = Depends(get_session)):
+    if eliminar_jugador(session, player_id):
+        return {"message": "Jugador eliminado correctamente"}
+    raise HTTPException(status_code=404, detail="Jugador no encontrado")
