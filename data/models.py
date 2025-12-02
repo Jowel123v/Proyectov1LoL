@@ -97,16 +97,26 @@ class MatchSummary(TableBase, table=True):
     avg_duration_min: float = Field(default=0.0)
     avg_kills_per_game: float = Field(default=0.0)
 
-    # Relaciones inversas (para 1:N con Team)
-    team_a: Optional[Team] = Relationship(back_populates="matches_as_team_a")
-    team_b: Optional[Team] = Relationship(back_populates="matches_as_team_b")
-    winner: Optional[Team] = Relationship(back_populates="matches_won")
+    #  Relaciones inversas (para 1:N con Team) CON foreign_keys explícitos
+    team_a: Optional[Team] = Relationship(
+        back_populates="matches_as_team_a",
+        sa_relationship_kwargs={"foreign_keys": "[MatchSummary.team_a_id]"},
+    )
+    team_b: Optional[Team] = Relationship(
+        back_populates="matches_as_team_b",
+        sa_relationship_kwargs={"foreign_keys": "[MatchSummary.team_b_id]"},
+    )
+    winner: Optional[Team] = Relationship(
+        back_populates="matches_won",
+        sa_relationship_kwargs={"foreign_keys": "[MatchSummary.winner_id]"},
+    )
 
     # N:M con Champion
     champions: List[Champion] = Relationship(
         back_populates="matches",
         link_model=MatchChampionLink,
     )
+
 
 # PLAYER MODELO
 
@@ -133,4 +143,5 @@ __all__ = [
     "Team",
     "MatchSummary",
     "MatchChampionLink",
+    "Player",
 ]
