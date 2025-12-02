@@ -5,7 +5,7 @@ from fastapi import FastAPI, Depends, HTTPException, Request, Query
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from db import get_session
+from utils.db import get_session
 
 # Modelos
 from data.models import Champion, Team, MatchSummary, Player
