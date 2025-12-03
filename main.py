@@ -53,7 +53,7 @@ def on_startup():
 
 # ROOT / HEALTH
 
-@app.get("/", tags=["Root"])
+@app.get("/a", tags=["Root"])
 def root():
     return {
         "message": "Bienvenido a la API de League of Legends Worlds",
