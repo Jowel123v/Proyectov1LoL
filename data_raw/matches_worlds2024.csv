@@ -1,4 +1,4 @@
-"stage,team_a,team_b,winner,avg_duration_min,avg_kills_per_game
+stage,team_a,team_b,winner,avg_duration_min,avg_kills_per_game
 Groups,T1,Bilibili Gaming,T1,32.5,24.0
 Groups,Gen.G,G2 Esports,Gen.G,30.2,21.5
 Groups,Top Esports,JD Gaming,JD Gaming,33.1,26.3
@@ -8,4 +8,3 @@ Quarters,Bilibili Gaming,Gen.G,Gen.G,34.0,27.9
 Semis,T1,Gen.G,T1,35.2,28.4
 Semis,Bilibili Gaming,JD Gaming,Bilibili Gaming,33.7,26.0
 Finals,T1,Bilibili Gaming,T1,36.5,29.3
-"

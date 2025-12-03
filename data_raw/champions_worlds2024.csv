@@ -1,4 +1,4 @@
-"slug,name,pick_rate,ban_rate,win_rate,kda
+slug,name,pick_rate,ban_rate,win_rate,kda
 ahri,Ahri,0.42,0.18,0.54,4.1
 azir,Azir,0.35,0.10,0.52,3.8
 orianna,Orianna,0.30,0.12,0.53,4.0
@@ -9,4 +9,3 @@ kaisa,Kai'Sa,0.47,0.28,0.56,4.6
 jinx,Jinx,0.40,0.22,0.51,3.7
 renekton,Renekton,0.26,0.15,0.48,2.9
 nautilus,Nautilus,0.29,0.19,0.50,3.4
-"
