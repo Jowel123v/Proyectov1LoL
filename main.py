@@ -75,7 +75,7 @@ def home(
         "champions": len(campeones),
         "matches": len(matches),
     }
-
+    print("enviados",stats)
     return templates.TemplateResponse(
         "index.html",
         {
