@@ -1,10 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Equipos · LoL Worlds{% endblock %}
 
-</body>
-</html>
+{% block content %}
+<h1>Equipos Worlds 2024</h1>
+
+<form method="get" class="filters">
+    <label>Filtrar por región:</label>
+    <input type="text" name="region" value="{{ region or '' }}" placeholder="LCK, LPL, LEC..." />
+    <button type="submit">Filtrar</button>
+</form>
+
+<table>
+    <thead>
+    <tr>
+        <th>Nombre</th>
+        <th>Región</th>
+        <th>W</th>
+        <th>L</th>
+        <th>KDA prom.</th>
+        <th>Champions favoritos</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for team in equipos %}
+        <tr>
+            <td>{{ team.name }}</td>
+            <td>{{ team.region }}</td>
+            <td>{{ team.wins }}</td>
+            <td>{{ team.losses }}</td>
+            <td>{{ "%.1f"|format(team.avg_kda) }}</td>
+            <td>{{ team.favorite_champions }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

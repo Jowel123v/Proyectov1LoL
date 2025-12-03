@@ -3,48 +3,42 @@
 {% block title %}Inicio · LoL Worlds{% endblock %}
 
 {% block content %}
-  <section class="hero">
-    <h1>Dashboard inicial LoL Worlds</h1>
-    <p>Explora equipos, jugadores y estadísticas básicas del torneo.</p>
-  </section>
+<h1>Resumen Worlds 2024</h1>
 
-  <section class="grid">
+<section class="cards">
     <div class="card">
-      <h2>Equipos registrados</h2>
-      {% if equipos %}
-        <ul class="list">
-          {% for team in equipos %}
-            <li>
-              <strong>{{ team.name }}</strong> · {{ team.region }}
-              <br />
-              W: {{ team.wins }} · L: {{ team.losses }} · KDA: {{ "%.2f"|format(team.avg_kda) }}
-            </li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <p>No hay equipos registrados aún.</p>
-      {% endif %}
+        <h2>Equipos</h2>
+        <p class="big-number">{{ total_teams }}</p>
     </div>
+    <div class="card">
+        <h2>Jugadores</h2>
+        <p class="big-number">{{ total_players }}</p>
+    </div>
+</section>
 
-    <div class="card">
-      <h2>Jugadores registrados</h2>
-      {% if jugadores %}
-        <ul class="list">
-          {% for player in jugadores %}
-            <li>
-              <strong>{{ player.nickname }}</strong> ({{ player.role }})
-              {% if player.team %}
-                – Team: {{ player.team.name }}
-              {% endif %}
-              {% if player.country %}
-                · {{ player.country }}
-              {% endif %}
-            </li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <p>No hay jugadores registrados aún.</p>
-      {% endif %}
-    </div>
-  </section>
+<section>
+    <h2>Equipos destacados</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Región</th>
+            <th>W</th>
+            <th>L</th>
+            <th>KDA prom.</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for team in equipos %}
+            <tr>
+                <td>{{ team.name }}</td>
+                <td>{{ team.region }}</td>
+                <td>{{ team.wins }}</td>
+                <td>{{ team.losses }}</td>
+                <td>{{ "%.1f"|format(team.avg_kda) }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
 {% endblock %}

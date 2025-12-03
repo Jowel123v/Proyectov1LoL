@@ -74,12 +74,12 @@ def home(
     request: Request,
     session: Session = Depends(get_session),
 ):
-    """
-    Página de inicio HTML.
-    Muestra un resumen básico de equipos y jugadores.
-    """
     equipos = listar_equipos(session, skip=0, limit=50, include_deleted=False)
     jugadores = listar_jugadores(session, skip=0, limit=50, include_deleted=False)
+
+    # estadísticas rápidas
+    total_teams = len(equipos)
+    total_players = len(jugadores)
 
     return templates.TemplateResponse(
         "index.html",
@@ -87,8 +87,54 @@ def home(
             "request": request,
             "equipos": equipos,
             "jugadores": jugadores,
+            "total_teams": total_teams,
+            "total_players": total_players,
         },
     )
+
+# ----- PÁGINAS HTML -----
+
+@app.get("/teams-html", response_class=HTMLResponse, tags=["Front"])
+def pagina_equipos(
+    request: Request,
+    region: str | None = Query(default=None),
+    session: Session = Depends(get_session),
+):
+    if region:
+        equipos = filtrar_equipo_por_region(session, region)
+    else:
+        equipos = listar_equipos(session, skip=0, limit=100, include_deleted=False)
+
+    return templates.TemplateResponse(
+        "teams.html",
+        {
+            "request": request,
+            "equipos": equipos,
+            "region": region,
+        },
+    )
+
+
+@app.get("/players-html", response_class=HTMLResponse, tags=["Front"])
+def pagina_jugadores(
+    request: Request,
+    role: str | None = Query(default=None),
+    session: Session = Depends(get_session),
+):
+    if role:
+        jugadores = filtrar_jugadores_por_rol(session, role)
+    else:
+        jugadores = listar_jugadores(session, skip=0, limit=200, include_deleted=False)
+
+    return templates.TemplateResponse(
+        "players.html",
+        {
+            "request": request,
+            "jugadores": jugadores,
+            "role": role,
+        },
+    )
+
 
 # CHAMPIONS  (orden: estáticas -> dinámicas)
 

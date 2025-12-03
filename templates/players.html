@@ -1,10 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Jugadores · LoL Worlds{% endblock %}
 
-</body>
-</html>
+{% block content %}
+<h1>Jugadores Worlds 2024</h1>
+
+<form method="get" class="filters">
+    <label>Filtrar por rol:</label>
+    <input type="text" name="role" value="{{ role or '' }}" placeholder="TOP, JNG, MID, ADC, SUP" />
+    <button type="submit">Filtrar</button>
+</form>
+
+<table>
+    <thead>
+    <tr>
+        <th>Nickname</th>
+        <th>Nombre real</th>
+        <th>Rol</th>
+        <th>País</th>
+        <th>Equipo (id)</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for p in jugadores %}
+        <tr>
+            <td>{{ p.nickname }}</td>
+            <td>{{ p.real_name }}</td>
+            <td>{{ p.role }}</td>
+            <td>{{ p.country }}</td>
+            <td>{{ p.team_id }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
