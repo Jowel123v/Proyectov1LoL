@@ -1,6 +1,5 @@
 import csv
 from pathlib import Path
-
 from sqlmodel import Session, select
 
 from utils.db import engine, crear_db
