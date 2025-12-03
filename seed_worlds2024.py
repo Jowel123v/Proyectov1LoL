@@ -10,7 +10,7 @@ from data.models import Team, Player, Champion, MatchSummary
 # RUTAS DE LOS CSV
 
 BASE_DIR = Path(__file__).parent
-DATA_DIR = BASE_DIR /"data"/ "data_raw"
+DATA_DIR = BASE_DIR / "data_raw"
 
 TEAMS_CSV = DATA_DIR / "teams_worlds2024.csv"
 PLAYERS_CSV = DATA_DIR / "players_worlds2024.csv"
