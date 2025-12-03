@@ -5,7 +5,7 @@ from fastapi import FastAPI, Depends, HTTPException, Request, Query
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from utils.db import get_session
+from utils.db import get_session, crear_db
 
 # Modelos
 from data.models import Champion, Team, MatchSummary, Player
@@ -31,20 +31,6 @@ from operations.operations_db import (
     buscar_jugadores_por_nickname, filtrar_jugadores_por_rol, filtrar_jugadores_por_equipo,
     obtener_jugador, actualizar_jugador, eliminar_jugador,
 )
-
-
-# CONFIGURACIÓN BASE DE DATOS
-
-DATABASE_URL = "sqlite:///database_lol.db"
-engine = create_engine(DATABASE_URL, echo=False)
-
-def crear_db():
-    SQLModel.metadata.create_all(engine)
-
-def get_session():
-    with Session(engine) as session:
-        yield session
-
 
 # CONFIGURACIÓN FASTAPI
 
