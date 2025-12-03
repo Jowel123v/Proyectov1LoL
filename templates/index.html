@@ -1,118 +1,271 @@
-{% extends "base.html" %}
-{% block content %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LoL Worlds Dashboard</title>
 
-<section class="hero">
-    <div class="hero-main">
-        <div>
-            <p class="badge">Dashboard · Worlds 2024</p>
-            <h1>Analítica de equipos y jugadores</h1>
-            <p class="hero-sub">
-                Consulta el rendimiento de los equipos, jugadores y campeones del último Worlds.
-                Los datos vienen de tu propia API con FastAPI + PostgreSQL.
-            </p>
-            <form class="hero-search" action="/teams/search/" method="get">
-                <select name="region" disabled>
-                    <option>Global</option>
-                </select>
-                <input
-                    type="text"
-                    name="nombre"
-                    placeholder="Busca un equipo (ej: T1, G2 Esports)...">
-                <button type="submit">Buscar</button>
-            </form>
-            <div class="hero-actions">
-                <a href="/docs" target="_blank" class="btn-primary">Ver documentación API</a>
-                <a href="/players/" target="_blank" class="btn-ghost">Ver JSON crudo</a>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#9146FF', // Neon Purple
+            secondary: '#00C2CB', // Teal
+            accent: '#0096FF', // Blue
+            dark: '#0A0A0A',
+            darker: '#050505',
+          },
+          fontFamily: {
+            gaming: ['Rajdhani', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+
+  <!-- Icons + Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Charts (por si luego los usamos) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="/static/styles.css"> <!-- Este es tu archivo de estilos -->
+</head>
+<body class="dark bg-dark text-gray-200">
+
+  <!-- LAYOUT PRINCIPAL -->
+  <div class="flex h-screen overflow-hidden">
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="w-64 bg-darker border-r border-gray-800 flex flex-col">
+      <div class="p-6 border-b border-gray-800">
+        <h1 class="text-2xl font-bold text-white font-gaming">
+          LoL <span class="text-primary">Worlds</span>
+        </h1>
+        <p class="text-xs text-gray-500 mt-1">FastAPI · PostgreSQL · Render</p>
+      </div>
+
+      <nav class="flex-1 py-4 overflow-y-auto">
+        <ul>
+          <li class="sidebar-menu-item active px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="overview">
+            <i class="fas fa-gauge text-primary"></i>
+            <span>Resumen</span>
+          </li>
+          <li class="sidebar-menu-item px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="champions">
+            <i class="fas fa-users text-primary"></i>
+            <span>Campeones</span>
+          </li>
+          <li class="sidebar-menu-item px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="teams">
+            <i class="fas fa-shield-alt text-primary"></i>
+            <span>Equipos</span>
+          </li>
+          <li class="sidebar-menu-item px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="players">
+            <i class="fas fa-user-ninja text-primary"></i>
+            <span>Jugadores</span>
+          </li>
+          <li class="sidebar-menu-item px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="matches">
+            <i class="fas fa-gamepad text-primary"></i>
+            <span>Partidas</span>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="p-4 border-t border-gray-800 text-xs text-gray-500">
+        Proyecto académico LoL Worlds<br>
+        <span class="text-primary">v1.0</span>
+      </div>
+    </aside>
+
+    <!-- CONTENIDO -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <!-- TOPBAR -->
+      <header class="bg-darker py-3 px-6 border-b border-gray-800 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <button id="toggle-sidebar" class="text-gray-400 hover:text-white">
+            <i class="fas fa-bars"></i>
+          </button>
+          <span class="text-gray-400 text-sm">Worlds 2024 · Dashboard</span>
+        </div>
+        <div class="flex items-center space-x-3 text-xs">
+          <a href="/docs" target="_blank"
+             class="px-3 py-1 rounded-full border border-gray-700 hover:border-primary hover:text-primary">
+            <i class="fas fa-code mr-1"></i> Ver API Docs
+          </a>
+        </div>
+      </header>
+
+      <!-- TABS -->
+      <main class="flex-1 overflow-y-auto">
+        <!-- TAB: RESUMEN -->
+        <section id="tab-overview" class="p-6 space-y-6">
+          <!-- Hero -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+            <div class="lg:col-span-2 bg-darker border border-gray-800 rounded-xl p-6 neon-border">
+              <p class="text-xs uppercase tracking-widest text-primary mb-1">Dashboard · Worlds 2024</p>
+              <h2 class="text-3xl font-bold mb-3">Analítica de equipos, jugadores y campeones</h2>
+              <p class="text-gray-400 text-sm mb-4">
+                Esta vista está conectada a tu API de FastAPI con base de datos PostgreSQL en Render.
+                Los números que ves abajo se calculan directamente desde las tablas <span class="text-primary">Team</span>,
+                <span class="text-primary">Player</span>, <span class="text-primary">Champion</span> y
+                <span class="text-primary">MatchSummary</span>.
+              </p>
+              <div class="flex flex-wrap gap-3 text-xs">
+                <span class="px-3 py-1 rounded-full bg-gray-900 border border-gray-700">
+                  <i class="fas fa-database mr-1 text-primary"></i> Render PostgreSQL
+                </span>
+                <span class="px-3 py-1 rounded-full bg-gray-900 border border-gray-700">
+                  <i class="fas fa-bolt mr-1 text-secondary"></i> FastAPI
+                </span>
+                <span class="px-3 py-1 rounded-full bg-gray-900 border border-gray-700">
+                  <i class="fas fa-chart-line mr-1 text-accent"></i> BI / Analítica
+                </span>
+              </div>
             </div>
-        </div>
-        <div class="hero-art">
-            <div class="orb"></div>
-            <div class="hero-avatar">LoL<br>GG</div>
-        </div>
-    </div>
-</section>
 
-<section class="stats-grid">
-    <div class="stat-card">
-        <p class="stat-label">Teams</p>
-        <p class="stat-value">{{ stats.teams }}</p>
-        <p class="stat-extra">Regiones LCK · LPL · LEC · etc.</p>
-    </div>
-    <div class="stat-card">
-        <p class="stat-label">Players</p>
-        <p class="stat-value">{{ stats.players }}</p>
-        <p class="stat-extra">TOP · JNG · MID · ADC · SUP</p>
-    </div>
-    <div class="stat-card">
-        <p class="stat-label">Champions</p>
-        <p class="stat-value">{{ stats.champions }}</p>
-        <p class="stat-extra">Meta picks & bans</p>
-    </div>
-    <div class="stat-card">
-        <p class="stat-label">Matches</p>
-        <p class="stat-value">{{ stats.matches }}</p>
-        <p class="stat-extra">Groups · Quarters · Semis · Final</p>
-    </div>
-</section>
+            <!-- Stats principales -->
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-darker border border-gray-800 rounded-xl p-4">
+                <p class="text-xs text-gray-400">Teams</p>
+                <p class="text-3xl font-bold text-secondary">{{ stats.teams }}</p>
+                <p class="text-[11px] text-gray-500 mt-1">Regiones LCK · LPL · LEC · etc.</p>
+              </div>
+              <div class="bg-darker border border-gray-800 rounded-xl p-4">
+                <p class="text-xs text-gray-400">Players</p>
+                <p class="text-3xl font-bold text-accent">{{ stats.players }}</p>
+                <p class="text-[11px] text-gray-500 mt-1">TOP · JNG · MID · ADC · SUP</p>
+              </div>
+              <div class="bg-darker border border-gray-800 rounded-xl p-4">
+                <p class="text-xs text-gray-400">Champions</p>
+                <p class="text-3xl font-bold text-primary">{{ stats.champions }}</p>
+                <p class="text-[11px] text-gray-500 mt-1">Picks & bans del meta</p>
+              </div>
+              <div class="bg-darker border border-gray-800 rounded-xl p-4">
+                <p class="text-xs text-gray-400">Matches</p>
+                <p class="text-3xl font-bold text-white">{{ stats.matches }}</p>
+                <p class="text-[11px] text-gray-500 mt-1">Groups · Quarters · Semis · Final</p>
+              </div>
+            </div>
+          </div>
 
-<section class="two-columns" id="teams">
-    <div class="column">
-        <div class="section-header">
-            <h2>Teams de Worlds</h2>
-            <span class="section-caption">Basado en dataset de Worlds 2024</span>
-        </div>
-        <div class="cards-grid">
-            {% for team in equipos %}
-            <article class="team-card">
-                <header>
-                    <h3>{{ team.name }}</h3>
-                    <span class="pill pill-region">{{ team.region }}</span>
-                </header>
-                <p class="team-kda">KDA promedio: <strong>{{ "%.2f"|format(team.avg_kda) }}</strong></p>
-                <p class="team-record">
-                    Record: <span class="win">{{ team.wins }}W</span> ·
-                    <span class="loss">{{ team.losses }}L</span>
-                </p>
-                {% if team.favorite_champions %}
-                <p class="team-champs">
-                    Picks clave: <span>{{ team.favorite_champions }}</span>
-                </p>
-                {% endif %}
-            </article>
-            {% endfor %}
-        </div>
-    </div>
-
-    <div class="column" id="players">
-        <div class="section-header">
-            <h2>Jugadores</h2>
-            <span class="section-caption">Primeros 50 registros de la base de datos</span>
-        </div>
-        <div class="table-wrapper">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Nickname</th>
-                        <th>Nombre real</th>
-                        <th>Rol</th>
-                        <th>País</th>
-                        <th>Team</th>
+          <!-- Vista rápida: equipos y jugadores -->
+          <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <!-- Equipos -->
+            <div class="bg-darker border border-gray-800 rounded-xl p-4">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <h3 class="text-lg font-bold">Top teams</h3>
+                  <p class="text-xs text-gray-500">Primeros equipos de la tabla Team</p>
+                </div>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="table-header text-xs text-gray-400">
+                      <th class="py-2 px-3 text-left">Team</th>
+                      <th class="py-2 px-3 text-left">Region</th>
+                      <th class="py-2 px-3 text-left">W/L</th>
+                      <th class="py-2 px-3 text-left">KDA</th>
                     </tr>
-                </thead>
-                <tbody>
-                    {% for player in jugadores %}
-                    <tr>
-                        <td>{{ player.nickname }}</td>
-                        <td>{{ player.real_name or "-" }}</td>
-                        <td>{{ player.role }}</td>
-                        <td>{{ player.country or "-" }}</td>
-                        <td>{{ player.team.name if player.team else "Sin equipo" }}</td>
+                  </thead>
+                  <tbody>
+                    {% for team in equipos %}
+                    <tr class="border-b border-gray-800 match-row">
+                      <td class="py-2 px-3 font-semibold text-white">{{ team.name }}</td>
+                      <td class="py-2 px-3 text-gray-300">{{ team.region }}</td>
+                      <td class="py-2 px-3">
+                        <span class="text-secondary font-bold">{{ team.wins }}W</span>
+                        <span class="text-gray-500"> / </span>
+                        <span class="text-red-400 font-bold">{{ team.losses }}L</span>
+                      </td>
+                      <td class="py-2 px-3 text-gray-300">
+                        {% if team.avg_kda %}
+                          {{ "%.2f"|format(team.avg_kda) }}
+                        {% else %}
+                          -
+                        {% endif %}
+                      </td>
                     </tr>
                     {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</section>
+                  </tbody>
+                </table>
+              </div>
+            </div>
 
-{% endblock %}
+            <!-- Jugadores -->
+            <div class="bg-darker border border-gray-800 rounded-xl p-4">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <h3 class="text-lg font-bold">Jugadores</h3>
+                  <p class="text-xs text-gray-500">Primeros 20 registros de Player</p>
+                </div>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="table-header text-xs text-gray-400">
+                      <th class="py-2 px-3 text-left">Nickname</th>
+                      <th class="py-2 px-3 text-left">Nombre real</th>
+                      <th class="py-2 px-3 text-left">Rol</th>
+                      <th class="py-2 px-3 text-left">País</th>
+                      <th class="py-2 px-3 text-left">Equipo</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for player in jugadores %}
+                    <tr class="border-b border-gray-800 match-row">
+                      <td class="py-2 px-3 font-semibold text-white">{{ player.nickname }}</td>
+                      <td class="py-2 px-3 text-gray-300">{{ player.real_name or "-" }}</td>
+                      <td class="py-2 px-3 text-gray-300">{{ player.role }}</td>
+                      <td class="py-2 px-3 text-gray-300">{{ player.country or "-" }}</td>
+                      <td class="py-2 px-3 text-gray-300">
+                        {% if player.team %}
+                          {{ player.team.name }}
+                        {% else %}
+                          Sin equipo
+                        {% endif %}
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Tabs
+    const items = document.querySelectorAll('.sidebar-menu-item');
+    const tabs = {
+      overview: document.getElementById('tab-overview'),
+      champions: document.getElementById('tab-champions'),
+      teams: document.getElementById('tab-teams'),
+      players: document.getElementById('tab-players'),
+      matches: document.getElementById('tab-matches'),
+    };
+
+    items.forEach(item => {
+      item.addEventListener('click', () => {
+        const tab = item.getAttribute('data-tab');
+
+        items.forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+
+        Object.values(tabs).forEach(t => t.classList.add('hidden'));
+        tabs[tab].classList.remove('hidden');
+      });
+    });
+  </script>
+</body>
+</html>

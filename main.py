@@ -83,8 +83,11 @@ def home(
             "stats": stats,
             "equipos": equipos,
             "jugadores": jugadores,
+            "campeones": campeones,
+            "matches": matches,
         },
     )
+
 
 
 # ----- PÁGINAS HTML -----
