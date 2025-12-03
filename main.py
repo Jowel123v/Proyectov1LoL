@@ -64,22 +64,28 @@ def home(
     session: Session = Depends(get_session),
 ):
     equipos = listar_equipos(session, skip=0, limit=50, include_deleted=False)
-    jugadores = listar_jugadores(session, skip=0, limit=50, include_deleted=False)
+    jugadores = listar_jugadores(session, skip=0, limit=200, include_deleted=False)
+    campeones = listar_campeones(session, skip=0, limit=200, include_deleted=False)
+    matches = listar_resumenes(session, skip=0, limit=500, include_deleted=False)
 
-    # estadísticas rápidas
-    total_teams = len(equipos)
-    total_players = len(jugadores)
+    # Stats para la tarjeta superior
+    stats = {
+        "teams": len(equipos),
+        "players": len(jugadores),
+        "champions": len(campeones),
+        "matches": len(matches),
+    }
 
     return templates.TemplateResponse(
         "index.html",
         {
             "request": request,
+            "stats": stats,
             "equipos": equipos,
             "jugadores": jugadores,
-            "total_teams": total_teams,
-            "total_players": total_players,
         },
     )
+
 
 # ----- PÁGINAS HTML -----
 
