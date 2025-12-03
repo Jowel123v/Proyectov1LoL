@@ -6,6 +6,10 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from utils.db import get_session, crear_db
+from fastapi import Form
+from fastapi.responses import RedirectResponse
+from starlette.status import HTTP_303_SEE_OTHER
+
 
 # Modelos
 from data.models import Champion, Team, MatchSummary, Player
@@ -49,21 +53,6 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 @app.on_event("startup")
 def on_startup():
     crear_db()
-
-
-# ROOT / HEALTH
-
-@app.get("/a", tags=["Root"])
-def root():
-    return {
-        "message": "Bienvenido a la API de League of Legends Worlds",
-        "docs": "/docs",
-        "endpoints": [
-            "/champions",
-            "/teams",
-            "/matches",
-        ],
-    }
 
 @app.get("/health", tags=["Root"])
 def health():
@@ -353,3 +342,49 @@ def eliminar_jugador_por_id(player_id: int, session: Session = Depends(get_sessi
     if eliminar_jugador(session, player_id):
         return {"message": "Jugador eliminado correctamente"}
     raise HTTPException(status_code=404, detail="Jugador no encontrado")
+
+# FORMULARIO HTML PARA CREAR JUGADOR
+
+@app.get("/players-html/new", response_class=HTMLResponse, tags=["Front"])
+def form_nuevo_jugador(
+    request: Request,
+    session: Session = Depends(get_session),
+):
+    # Necesitamos los equipos para llenar el <select>
+    equipos = listar_equipos(session, skip=0, limit=100, include_deleted=False)
+
+    return templates.TemplateResponse(
+        "player_form.html",
+        {
+            "request": request,
+            "equipos": equipos,
+        },
+    )
+
+
+@app.post("/players-html/new", response_class=HTMLResponse, tags=["Front"])
+async def crear_jugador_desde_form(
+    request: Request,
+    nickname: str = Form(...),
+    real_name: str = Form(""),
+    role: str = Form(...),
+    country: str = Form(""),
+    team_id: int = Form(...),
+    session: Session = Depends(get_session),
+):
+    # Construimos el objeto Player (modelo SQLModel)
+    obj = Player(
+        nickname=nickname,
+        real_name=real_name or None,
+        role=role,
+        country=country or None,
+        team_id=team_id,
+    )
+
+    crear_jugador(session, obj)
+
+    # Redirigimos a la lista de jugadores HTML
+    return RedirectResponse(
+        url="/players-html",
+        status_code=HTTP_303_SEE_OTHER,
+    )
