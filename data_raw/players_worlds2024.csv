@@ -1,22 +1,42 @@
 "nickname,real_name,role,country,team_name
-Zeus,Choi Woo-je,TOP,KR,T1
-Oner,Moon Hyeon-joon,JNG,KR,T1
-Faker,Lee Sang-hyeok,MID,KR,T1
-Gumayusi,Lee Min-hyeong,ADC,KR,T1
-Keria,Ryu Min-seok,SUP,KR,T1
-Bin,Chen Ze-Bin,TOP,CN,Bilibili Gaming
-Xun,Peng Lixun,JNG,CN,Bilibili Gaming
-Knight,Zhuo Ding,MID,CN,Bilibili Gaming
-Elk,Zhao Jia-Hao,ADC,CN,Bilibili Gaming
-ON,Li Xiang,SUP,CN,Bilibili Gaming
-Doran,Choi Hyeon-joon,TOP,KR,Gen.G
-Peanut,Han Wang-ho,JNG,KR,Gen.G
-Chovy,Jeong Ji-hoon,MID,KR,Gen.G
-Peyz,Kim Su-hwan,ADC,KR,Gen.G
-Delight,Yoo Hwan-joong,SUP,KR,Gen.G
-BrokenBlade,Sergen Çelik,TOP,DE,G2 Esports
-Caps,Rasmus Winther,MID,DK,G2 Esports
-Hans sama,Steven Liv,ADC,FR,G2 Esports
-Mikyx,Mihael Mehle,SUP,SI,G2 Esports
-Tian,Gao Tian-Liang,JNG,CN,Top Esports
+Zeus,Choi Woo-je,TOP,South Korea,T1
+Oner,Moon Hyeon-joon,JNG,South Korea,T1
+Faker,Lee Sang-hyeok,MID,South Korea,T1
+Gumayusi,Lee Min-hyeong,ADC,South Korea,T1
+Keria,Ryu Min-seok,SUP,South Korea,T1
+Bin,Chen Ze-Bin,TOP,China,Bilibili Gaming
+Xun,Wei Lixin,JNG,China,Bilibili Gaming
+Knight,Zhuo Ding,MID,China,Bilibili Gaming
+Elk,Zhao Jia-Hao,ADC,China,Bilibili Gaming
+ON,Lo Wen-Jun,SUP,China,Bilibili Gaming
+Doran,Choi Hyeon-joon,TOP,South Korea,Gen.G
+Canyon,Kim Geon-bu,JNG,South Korea,Gen.G
+Chovy,Jeong Ji-hoon,MID,South Korea,Gen.G
+Peyz,Kim Su-hwan,ADC,South Korea,Gen.G
+Lehends,Son Si-woo,SUP,South Korea,Gen.G
+BrokenBlade,Sergen Çelik,TOP,Germany,G2 Esports
+Yike,Martin Sundelin,JNG,Sweden,G2 Esports
+Caps,Rasmus Winther,MID,Denmark,G2 Esports
+HansSama,Steven Liv,ADC,France,G2 Esports
+Mikyx,Mihael Mehle,SUP,Slovenia,G2 Esports
+369,Bai Jia-Hao,TOP,China,Top Esports
+Tian,Gao Tian-Liang,JNG,China,Top Esports
+Creme,Chen Jian-Ming,MID,China,Top Esports
+JackeyLove,Yu Wen-Bo,ADC,China,Top Esports
+Meiko,Tian Ye,SUP,China,Top Esports
+Kanavi,Seo Jin-hyeok,JNG,South Korea,JD Gaming
+369-2,Bai Jia-Hao,TOP,China,JD Gaming
+Yagao,Zeng Qi,MID,China,JD Gaming
+Ruler,Park Jae-hyuk,ADC,South Korea,JD Gaming
+Missing,Lou Yun-Feng,SUP,China,JD Gaming
+Kingen,Hwang Seong-hoon,TOP,South Korea,Hanwha Life Esports
+Grizzly,Park Hyeon-seok,JNG,South Korea,Hanwha Life Esports
+Zeka,Kim Geon-woo,MID,South Korea,Hanwha Life Esports
+Viper,Park Do-hyeon,ADC,South Korea,Hanwha Life Esports
+Life,Kim Jeong-min,SUP,South Korea,Hanwha Life Esports
+Oscarinin,Óscar Muñoz Jiménez,TOP,Spain,Fnatic
+Razork,Iván Martín Díaz,JNG,Spain,Fnatic
+Humanoid,Marek Brázda,MID,Czech Republic,Fnatic
+Noah,Oh Hyeon-taek,ADC,South Korea,Fnatic
+Jun,Yoon Se-jun,SUP,South Korea,Fnatic
 "
