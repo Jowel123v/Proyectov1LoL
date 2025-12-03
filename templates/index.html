@@ -1,44 +1,118 @@
 {% extends "base.html" %}
-
-{% block title %}Inicio · LoL Worlds{% endblock %}
-
 {% block content %}
-<h1>Resumen Worlds 2024</h1>
 
-<section class="cards">
-    <div class="card">
-        <h2>Equipos</h2>
-        <p class="big-number">{{ total_teams }}</p>
-    </div>
-    <div class="card">
-        <h2>Jugadores</h2>
-        <p class="big-number">{{ total_players }}</p>
+<section class="hero">
+    <div class="hero-main">
+        <div>
+            <p class="badge">Dashboard · Worlds 2024</p>
+            <h1>Analítica de equipos y jugadores</h1>
+            <p class="hero-sub">
+                Consulta el rendimiento de los equipos, jugadores y campeones del último Worlds.
+                Los datos vienen de tu propia API con FastAPI + PostgreSQL.
+            </p>
+            <form class="hero-search" action="/teams/search/" method="get">
+                <select name="region" disabled>
+                    <option>Global</option>
+                </select>
+                <input
+                    type="text"
+                    name="nombre"
+                    placeholder="Busca un equipo (ej: T1, G2 Esports)...">
+                <button type="submit">Buscar</button>
+            </form>
+            <div class="hero-actions">
+                <a href="/docs" target="_blank" class="btn-primary">Ver documentación API</a>
+                <a href="/players/" target="_blank" class="btn-ghost">Ver JSON crudo</a>
+            </div>
+        </div>
+        <div class="hero-art">
+            <div class="orb"></div>
+            <div class="hero-avatar">LoL<br>GG</div>
+        </div>
     </div>
 </section>
 
-<section>
-    <h2>Equipos destacados</h2>
-    <table>
-        <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Región</th>
-            <th>W</th>
-            <th>L</th>
-            <th>KDA prom.</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for team in equipos %}
-            <tr>
-                <td>{{ team.name }}</td>
-                <td>{{ team.region }}</td>
-                <td>{{ team.wins }}</td>
-                <td>{{ team.losses }}</td>
-                <td>{{ "%.1f"|format(team.avg_kda) }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+<section class="stats-grid">
+    <div class="stat-card">
+        <p class="stat-label">Teams</p>
+        <p class="stat-value">{{ stats.teams }}</p>
+        <p class="stat-extra">Regiones LCK · LPL · LEC · etc.</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-label">Players</p>
+        <p class="stat-value">{{ stats.players }}</p>
+        <p class="stat-extra">TOP · JNG · MID · ADC · SUP</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-label">Champions</p>
+        <p class="stat-value">{{ stats.champions }}</p>
+        <p class="stat-extra">Meta picks & bans</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-label">Matches</p>
+        <p class="stat-value">{{ stats.matches }}</p>
+        <p class="stat-extra">Groups · Quarters · Semis · Final</p>
+    </div>
 </section>
+
+<section class="two-columns" id="teams">
+    <div class="column">
+        <div class="section-header">
+            <h2>Teams de Worlds</h2>
+            <span class="section-caption">Basado en dataset de Worlds 2024</span>
+        </div>
+        <div class="cards-grid">
+            {% for team in equipos %}
+            <article class="team-card">
+                <header>
+                    <h3>{{ team.name }}</h3>
+                    <span class="pill pill-region">{{ team.region }}</span>
+                </header>
+                <p class="team-kda">KDA promedio: <strong>{{ "%.2f"|format(team.avg_kda) }}</strong></p>
+                <p class="team-record">
+                    Record: <span class="win">{{ team.wins }}W</span> ·
+                    <span class="loss">{{ team.losses }}L</span>
+                </p>
+                {% if team.favorite_champions %}
+                <p class="team-champs">
+                    Picks clave: <span>{{ team.favorite_champions }}</span>
+                </p>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="column" id="players">
+        <div class="section-header">
+            <h2>Jugadores</h2>
+            <span class="section-caption">Primeros 50 registros de la base de datos</span>
+        </div>
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Nickname</th>
+                        <th>Nombre real</th>
+                        <th>Rol</th>
+                        <th>País</th>
+                        <th>Team</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in jugadores %}
+                    <tr>
+                        <td>{{ player.nickname }}</td>
+                        <td>{{ player.real_name or "-" }}</td>
+                        <td>{{ player.role }}</td>
+                        <td>{{ player.country or "-" }}</td>
+                        <td>{{ player.team.name if player.team else "Sin equipo" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
 {% endblock %}

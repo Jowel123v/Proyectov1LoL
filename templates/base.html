@@ -1,26 +1,34 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <title>{% block title %}LoL Worlds Dashboard{% endblock %}</title>
-    <link rel="stylesheet" href="/static/styles.css" />
+    <meta charset="UTF-8">
+    <title>{{ title or "LoL Worlds Dashboard" }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{ url_for('static', path='styles.css') }}" rel="stylesheet">
 </head>
-<body>
-<header>
-    <nav class="navbar">
-        <a href="/">Inicio</a>
-        <a href="/teams-html">Equipos</a>
-        <a href="/players-html">Jugadores</a>
-        <a href="/docs" target="_blank">API Docs</a>
-    </nav>
+<body class="body-dark">
+<header class="topbar">
+    <div class="topbar-left">
+        <div class="logo">LoL<span>Worlds</span></div>
+        <nav class="nav-links">
+            <a href="/">Home</a>
+            <a href="#teams">Teams</a>
+            <a href="#players">Players</a>
+            <a href="/docs" target="_blank">API Docs</a>
+        </nav>
+    </div>
+    <div class="topbar-right">
+        <span class="tag-pill">FastAPI</span>
+        <span class="tag-pill">Render DB</span>
+    </div>
 </header>
 
-<main class="container">
+<main class="main-container">
     {% block content %}{% endblock %}
 </main>
 
-<footer>
-    <small>Proyecto LoL Worlds · FastAPI + Render</small>
+<footer class="footer">
+    <p>Proyecto final · Worlds 2024 · FastAPI + PostgreSQL</p>
 </footer>
 </body>
 </html>
