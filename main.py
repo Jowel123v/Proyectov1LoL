@@ -139,6 +139,10 @@ def home(
         
         matches_with_names.append(match_dict)
 
+    # Convertir jugadores y campeones a diccionarios para serialización JSON
+    jugadores_dict = [jugador.model_dump() for jugador in jugadores]
+    campeones_dict = [campeon.model_dump() for campeon in campeones]
+
     # Retornar la respuesta con los cálculos de los promedios
     return templates.TemplateResponse(
         "index.html",
@@ -146,8 +150,8 @@ def home(
             "request": request,
             "stats": stats,
             "equipos": equipos_con_winrate,
-            "jugadores": jugadores,
-            "campeones": campeones,
+            "jugadores": jugadores_dict,
+            "campeones": campeones_dict,
             "matches": matches_with_names,
         },
     )

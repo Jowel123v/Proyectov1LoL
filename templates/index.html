@@ -35,6 +35,21 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
 
   <style>
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(145, 70, 255, 0.3); }
+      50% { box-shadow: 0 0 30px rgba(145, 70, 255, 0.6); }
+    }
+
     .sidebar-menu-item {
       transition: all 0.3s ease;
       position: relative;
@@ -42,6 +57,7 @@
     .sidebar-menu-item:hover {
       background: rgba(145, 70, 255, 0.1);
       border-left: 3px solid #9146FF;
+      transform: translateX(5px);
     }
     .sidebar-menu-item.active {
       background: rgba(145, 70, 255, 0.2);
@@ -50,15 +66,19 @@
     }
     .neon-border {
       box-shadow: 0 0 20px rgba(145, 70, 255, 0.3);
+      animation: glow 3s infinite;
     }
     .match-row:hover {
       background: rgba(145, 70, 255, 0.05);
+      transform: scale(1.01);
+      transition: all 0.2s ease;
     }
     .tab-section {
       display: none;
     }
     .tab-section.active {
       display: block;
+      animation: slideIn 0.5s ease;
     }
     .filters {
       background: #050505;
@@ -91,6 +111,8 @@
     }
     .filters button:hover {
       background: #7c3ae0;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(145, 70, 255, 0.4);
     }
     .navbar-link:hover, .navbar-link:focus {
       background: rgba(145, 70, 255, 0.1);
@@ -100,6 +122,46 @@
       outline: none;
       border-color: #9146FF;
       box-shadow: 0 0 0 2px rgba(145, 70, 255, 0.2);
+    }
+
+    /* Gradientes personalizados */
+    .card-gradient {
+      background: linear-gradient(135deg, rgba(145, 70, 255, 0.1) 0%, rgba(0, 194, 203, 0.1) 100%);
+      border: 1px solid rgba(145, 70, 255, 0.3);
+    }
+    
+    .badge-success {
+      background: linear-gradient(135deg, #10b981, #059669);
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .badge-warning {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .badge-danger {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    /* Hover effects mejorados */
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(145, 70, 255, 0.3);
+    }
+
+    .animate-pulse {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
   </style>
 </head>
@@ -117,36 +179,34 @@
 
       <nav class="flex-1 py-4 overflow-y-auto">
         <ul>
-          <li class="sidebar-menu-item active px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="overview">
-            <i class="fas fa-gauge text-primary"></i>
-            <span>Resumen</span>
+         
+          
+          <!-- SECCIÓN DE GESTIÓN -->
+          <li class="px-6 py-2 mt-4">
+            <p class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Gestión</p>
           </li>
-          <li class="sidebar-menu-item px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="champions">
-            <i class="fas fa-users text-primary"></i>
-            <span>Campeones</span>
+          <li class="sidebar-menu-item px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="add-team">
+            <i class="fas fa-plus-circle text-cyan-500"></i>
+            <span>Crear Equipo</span>
           </li>
-          <li class="sidebar-menu-item px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="teams">
-            <i class="fas fa-shield-alt text-primary"></i>
-            <span>Equipos</span>
+          <li class="sidebar-menu-item px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="add-player">
+            <i class="fas fa-user-plus text-green-500"></i>
+            <span>Crear Jugador</span>
           </li>
-          <li class="sidebar-menu-item px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="players">
-            <i class="fas fa-user-ninja text-primary"></i>
-            <span>Jugadores</span>
+          <li class="sidebar-menu-item px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="add-champion">
+            <i class="fas fa-star text-purple-500"></i>
+            <span>Crear Campeón</span>
           </li>
-          <li class="sidebar-menu-item px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="matches">
-            <i class="fas fa-gamepad text-primary"></i>
-            <span>Partidas</span>
-          </li>
-          <li class="sidebar-menu-item px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="management">
-            <i class="fas fa-plus-circle text-primary"></i>
-            <span>Gestión</span>
+          <li class="sidebar-menu-item px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="add-match">
+            <i class="fas fa-trophy text-pink-500"></i>
+            <span>Crear Partida</span>
           </li>
         </ul>
       </nav>
 
       <div class="p-4 border-t border-gray-800 text-xs text-gray-500">
         Proyecto académico LoL Worlds<br>
-        <span class="text-primary">v1.0</span>
+        <span class="text-primary">v2.0 - Enhanced</span>
       </div>
     </aside>
 
@@ -175,8 +235,8 @@
               <a href="#" class="navbar-link px-3 py-2 rounded-lg hover:bg-gray-800 hover:text-primary transition" data-tab="players">
                 <i class="fas fa-user-ninja mr-1"></i> Jugadores
               </a>
-              <a href="#" class="navbar-link px-3 py-2 rounded-lg hover:bg-gray-800 hover:text-primary transition" data-tab="management">
-                <i class="fas fa-plus-circle mr-1"></i> Gestión
+              <a href="#" class="navbar-link px-3 py-2 rounded-lg hover:bg-gray-800 hover:text-primary transition" data-tab="matches">
+                <i class="fas fa-gamepad mr-1"></i> Partidas
               </a>
             </nav>
           </div>
@@ -195,69 +255,171 @@
 
         <!-- TAB: RESUMEN -->
         <section id="tab-overview" class="tab-section active p-6 space-y-6">
+          <!-- Hero Section -->
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-            <div class="lg:col-span-2 bg-darker border border-gray-800 rounded-xl p-6 neon-border">
-              <p class="text-xs uppercase tracking-widest text-primary mb-1">Dashboard · Worlds 2024</p>
-              <h2 class="text-3xl font-bold mb-3">Analítica de equipos, jugadores y campeones</h2>
+            <div class="lg:col-span-2 bg-gradient-to-br from-purple-900/20 to-blue-900/20 border border-gray-800 rounded-xl p-6 neon-border hover:shadow-2xl transition-all duration-300">
+              <p class="text-xs uppercase tracking-widest text-primary mb-1 animate-pulse">Dashboard · Worlds 2024</p>
+              <h2 class="text-3xl font-bold mb-3 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">Analítica de equipos, jugadores y campeones</h2>
               <p class="text-gray-400 text-sm mb-4">
                 API para Gestión de Datos utilizando FastAPI y PostgreSQL alojada en Render.
               </p>
 
               <div class="mb-4">
-                <img src="/static/img/77970_10152151413760556_1922913272_o.webp" alt="League of Legends Worlds" class="w-full h-48 object-cover rounded-lg border border-gray-700">
+                <img src="/static/img/77970_10152151413760556_1922913272_o.webp" alt="League of Legends Worlds" class="w-full h-48 object-cover rounded-lg border border-gray-700 hover:scale-105 transition-transform duration-300">
               </div>
 
               <div class="flex flex-wrap gap-3 text-xs">
-                <span class="px-3 py-1 rounded-full bg-gray-900 border border-gray-700">
+                <span class="px-3 py-1 rounded-full bg-gradient-to-r from-purple-900/50 to-purple-800/50 border border-purple-600/50 hover:border-purple-400 transition-all">
                   <i class="fas fa-database mr-1 text-primary"></i> Render PostgreSQL
                 </span>
-                <span class="px-3 py-1 rounded-full bg-gray-900 border border-gray-700">
+                <span class="px-3 py-1 rounded-full bg-gradient-to-r from-blue-900/50 to-cyan-800/50 border border-cyan-600/50 hover:border-cyan-400 transition-all">
                   <i class="fas fa-bolt mr-1 text-secondary"></i> FastAPI
                 </span>
               </div>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
-              <div class="bg-darker border border-gray-800 rounded-xl p-4">
-                <p class="text-xs text-gray-400">Teams</p>
+              <div class="bg-gradient-to-br from-cyan-900/20 to-cyan-700/20 border border-cyan-800 rounded-xl p-4 hover:scale-105 transition-transform duration-200 cursor-pointer group">
+                <p class="text-xs text-gray-400 group-hover:text-cyan-400 transition">Teams</p>
                 <p class="text-3xl font-bold text-secondary">{{ stats.teams }}</p>
+                <span class="inline-block mt-2 px-2 py-1 bg-cyan-900/30 rounded text-xs text-cyan-300">+{{ stats.teams }}</span>
               </div>
-              <div class="bg-darker border border-gray-800 rounded-xl p-4">
-                <p class="text-xs text-gray-400">Players</p>
+              <div class="bg-gradient-to-br from-blue-900/20 to-blue-700/20 border border-blue-800 rounded-xl p-4 hover:scale-105 transition-transform duration-200 cursor-pointer group">
+                <p class="text-xs text-gray-400 group-hover:text-blue-400 transition">Players</p>
                 <p class="text-3xl font-bold text-accent">{{ stats.players }}</p>
+                <span class="inline-block mt-2 px-2 py-1 bg-blue-900/30 rounded text-xs text-blue-300">+{{ stats.players }}</span>
               </div>
-              <div class="bg-darker border border-gray-800 rounded-xl p-4">
-                <p class="text-xs text-gray-400">Champions</p>
+              <div class="bg-gradient-to-br from-purple-900/20 to-purple-700/20 border border-purple-800 rounded-xl p-4 hover:scale-105 transition-transform duration-200 cursor-pointer group">
+                <p class="text-xs text-gray-400 group-hover:text-purple-400 transition">Champions</p>
                 <p class="text-3xl font-bold text-primary">{{ stats.champions }}</p>
+                <span class="inline-block mt-2 px-2 py-1 bg-purple-900/30 rounded text-xs text-purple-300">+{{ stats.champions }}</span>
               </div>
-              <div class="bg-darker border border-gray-800 rounded-xl p-4">
-                <p class="text-xs text-gray-400">Matches</p>
+              <div class="bg-gradient-to-br from-pink-900/20 to-red-700/20 border border-pink-800 rounded-xl p-4 hover:scale-105 transition-transform duration-200 cursor-pointer group">
+                <p class="text-xs text-gray-400 group-hover:text-pink-400 transition">Matches</p>
                 <p class="text-3xl font-bold text-white">{{ stats.matches }}</p>
+                <span class="inline-block mt-2 px-2 py-1 bg-pink-900/30 rounded text-xs text-pink-300">+{{ stats.matches }}</span>
               </div>
+            </div>
+          </div>
+
+          <!-- Estadísticas Avanzadas -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-gradient-to-br from-yellow-900/20 to-orange-900/20 border border-yellow-800 rounded-xl p-6 hover:shadow-lg transition-all duration-300">
+              <div class="flex items-center justify-between mb-4">
+                <i class="fas fa-trophy text-yellow-500 text-3xl"></i>
+                <span class="px-3 py-1 bg-yellow-900/50 rounded-full text-yellow-300 text-xs font-bold">TOP</span>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2">Mejor Equipo</h3>
+              <p class="text-2xl font-bold text-yellow-400" id="best-team-name">-</p>
+              <p class="text-sm text-gray-400 mt-1">
+                <span class="text-yellow-300" id="best-team-wins">0</span>W / 
+                <span class="text-red-400" id="best-team-losses">0</span>L
+                <span class="ml-2 text-yellow-300" id="best-team-winrate">0%</span>
+              </p>
+            </div>
+
+            <div class="bg-gradient-to-br from-green-900/20 to-emerald-900/20 border border-green-800 rounded-xl p-6 hover:shadow-lg transition-all duration-300">
+              <div class="flex items-center justify-between mb-4">
+                <i class="fas fa-user-astronaut text-green-500 text-3xl"></i>
+                <span class="px-3 py-1 bg-green-900/50 rounded-full text-green-300 text-xs font-bold">MVP</span>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2">Mejor Jugador</h3>
+              <p class="text-2xl font-bold text-green-400" id="best-player-name">-</p>
+              <p class="text-sm text-gray-400 mt-1">
+                KDA: <span class="text-green-300" id="best-player-kda">0.00</span>
+                <span class="ml-2 text-gray-500" id="best-player-role">-</span>
+              </p>
+            </div>
+
+            <div class="bg-gradient-to-br from-red-900/20 to-rose-900/20 border border-red-800 rounded-xl p-6 hover:shadow-lg transition-all duration-300">
+              <div class="flex items-center justify-between mb-4">
+                <i class="fas fa-fire text-red-500 text-3xl"></i>
+                <span class="px-3 py-1 bg-red-900/50 rounded-full text-red-300 text-xs font-bold">HOT</span>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2">Campeón Dominante</h3>
+              <p class="text-2xl font-bold text-red-400" id="best-champion-name">-</p>
+              <p class="text-sm text-gray-400 mt-1">
+                WR: <span class="text-red-300" id="best-champion-winrate">0%</span>
+                <span class="ml-2">Pick: <span class="text-red-300" id="best-champion-pickrate">0%</span></span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Gráficas Interactivas -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Top 5 Equipos -->
+            <div class="bg-darker border border-gray-800 rounded-xl p-6 hover:border-primary transition-all duration-300">
+              <h3 class="text-xl font-bold mb-4 flex items-center">
+                <i class="fas fa-chart-bar text-primary mr-2"></i>
+                Top 5 Equipos (Victorias)
+              </h3>
+              <canvas id="chart-top-teams"></canvas>
+            </div>
+
+            <!-- Campeones Más Pickeados/Baneados -->
+            <div class="bg-darker border border-gray-800 rounded-xl p-6 hover:border-primary transition-all duration-300">
+              <h3 class="text-xl font-bold mb-4 flex items-center">
+                <i class="fas fa-chart-pie text-secondary mr-2"></i>
+                Campeones + Pickeados/Baneados
+              </h3>
+              <canvas id="chart-champions"></canvas>
+            </div>
+
+            <!-- Distribución de Roles -->
+            <div class="bg-darker border border-gray-800 rounded-xl p-6 hover:border-primary transition-all duration-300">
+              <h3 class="text-xl font-bold mb-4 flex items-center">
+                <i class="fas fa-chart-pie text-accent mr-2"></i>
+                Distribución de Roles
+              </h3>
+              <canvas id="chart-roles"></canvas>
+            </div>
+
+            <!-- KDA Promedio por Equipo -->
+            <div class="bg-darker border border-gray-800 rounded-xl p-6 hover:border-primary transition-all duration-300">
+              <h3 class="text-xl font-bold mb-4 flex items-center">
+                <i class="fas fa-chart-line text-yellow-500 mr-2"></i>
+                KDA Promedio por Equipo (Top 8)
+              </h3>
+              <canvas id="chart-kda"></canvas>
             </div>
           </div>
         </section>
 
         <!-- TAB: CAMPEONES -->
         <section id="tab-champions" class="tab-section p-6 space-y-6">
-          <h1 class="text-3xl font-bold mb-4">Campeones Worlds 2024</h1>
+          <h1 class="text-3xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Campeones Worlds 2024</h1>
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            <div class="bg-darker border border-gray-800 rounded-xl p-6">
-              <h3 class="text-xl font-bold text-white">Campeones Totales</h3>
-              <p class="text-gray-400 text-sm">{{ stats.champions }} campeones registrados</p>
+            <div class="bg-gradient-to-br from-purple-900/20 to-purple-700/20 border border-purple-800 rounded-xl p-6 hover:scale-105 transition-all duration-300">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-xl font-bold text-white">Campeones Totales</h3>
+                  <p class="text-gray-400 text-sm">{{ stats.champions }} campeones registrados</p>
+                </div>
+                <i class="fas fa-users text-purple-500 text-4xl"></i>
+              </div>
             </div>
-            <div class="bg-darker border border-gray-800 rounded-xl p-6">
-              <h3 class="text-xl font-bold text-white">Promedio Pick Rate</h3>
-              <p class="text-gray-400 text-sm">{{ "%.1f"|format(stats.avg_champion_pick_rate) }}%</p>
+            <div class="bg-gradient-to-br from-blue-900/20 to-blue-700/20 border border-blue-800 rounded-xl p-6 hover:scale-105 transition-all duration-300">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-xl font-bold text-white">Promedio Pick Rate</h3>
+                  <p class="text-blue-400 text-2xl font-bold">{{ "%.1f"|format(stats.avg_champion_pick_rate) }}%</p>
+                </div>
+                <i class="fas fa-hand-pointer text-blue-500 text-4xl"></i>
+              </div>
             </div>
-            <div class="bg-darker border border-gray-800 rounded-xl p-6">
-              <h3 class="text-xl font-bold text-white">Promedio Win Rate</h3>
-              <p class="text-gray-400 text-sm">{{ "%.1f"|format(stats.avg_champion_win_rate) }}%</p>
+            <div class="bg-gradient-to-br from-green-900/20 to-green-700/20 border border-green-800 rounded-xl p-6 hover:scale-105 transition-all duration-300">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-xl font-bold text-white">Promedio Win Rate</h3>
+                  <p class="text-green-400 text-2xl font-bold">{{ "%.1f"|format(stats.avg_champion_win_rate) }}%</p>
+                </div>
+                <i class="fas fa-trophy text-green-500 text-4xl"></i>
+              </div>
             </div>
           </div>
 
-          <div class="bg-darker border border-gray-800 rounded-xl p-6">
+          <div class="bg-darker border border-gray-800 rounded-xl p-6 hover:border-primary transition-all duration-300">
             <div class="overflow-x-auto">
               <table class="w-full text-sm">
                 <thead>
@@ -267,16 +429,46 @@
                     <th class="py-3 px-4 text-left">Ban Rate</th>
                     <th class="py-3 px-4 text-left">Win Rate</th>
                     <th class="py-3 px-4 text-left">KDA</th>
+                    <th class="py-3 px-4 text-left">Estado</th>
                   </tr>
                 </thead>
                 <tbody>
                   {% for champion in campeones %}
-                  <tr class="border-b border-gray-800 match-row">
-                    <td class="py-3 px-4 font-semibold text-white">{{ champion.name }}</td>
-                    <td class="py-3 px-4 text-secondary">{{ "%.1f"|format(champion.pick_rate) }}%</td>
-                    <td class="py-3 px-4 text-red-400">{{ "%.1f"|format(champion.ban_rate) }}%</td>
-                    <td class="py-3 px-4 text-accent">{{ "%.1f"|format(champion.win_rate) }}%</td>
-                    <td class="py-3 px-4 text-gray-300">{{ "%.2f"|format(champion.kda) }}</td>
+                  <tr class="border-b border-gray-800 match-row cursor-pointer">
+                    <td class="py-3 px-4">
+                      <span class="font-bold text-white">{{ champion.name }}</span>
+                    </td>
+                    <td class="py-3 px-4">
+                      <span class="badge-success">{{ "%.1f"|format(champion.pick_rate * 100) }}%</span>
+                    </td>
+                    <td class="py-3 px-4">
+                      <span class="badge-danger">{{ "%.1f"|format(champion.ban_rate * 100) }}%</span>
+                    </td>
+                    <td class="py-3 px-4">
+                      {% if champion.win_rate >= 0.52 %}
+                        <span class="badge-success">{{ "%.1f"|format(champion.win_rate * 100) }}%</span>
+                      {% elif champion.win_rate >= 0.48 %}
+                        <span class="badge-warning">{{ "%.1f"|format(champion.win_rate * 100) }}%</span>
+                      {% else %}
+                        <span class="badge-danger">{{ "%.1f"|format(champion.win_rate * 100) }}%</span>
+                      {% endif %}
+                    </td>
+                    <td class="py-3 px-4">
+                      <span class="text-yellow-400 font-bold">{{ "%.2f"|format(champion.kda) }}</span>
+                    </td>
+                    <td class="py-3 px-4">
+                      {% if champion.pick_rate >= 0.3 and champion.win_rate >= 0.5 %}
+                        <span class="px-2 py-1 bg-red-900/50 text-red-300 rounded text-xs">
+                          <i class="fas fa-fire"></i> META
+                        </span>
+                      {% elif champion.ban_rate >= 0.4 %}
+                        <span class="px-2 py-1 bg-purple-900/50 text-purple-300 rounded text-xs">
+                          <i class="fas fa-ban"></i> BANNED
+                        </span>
+                      {% else %}
+                        <span class="px-2 py-1 bg-gray-900/50 text-gray-400 rounded text-xs">NORMAL</span>
+                      {% endif %}
+                    </td>
                   </tr>
                   {% endfor %}
                 </tbody>
@@ -291,24 +483,39 @@
 
         <!-- TAB: EQUIPOS -->
         <section id="tab-teams" class="tab-section p-6 space-y-6">
-          <h1 class="text-3xl font-bold mb-4">Equipos Worlds 2024</h1>
+          <h1 class="text-3xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Equipos Worlds 2024</h1>
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            <div class="bg-darker border border-gray-800 rounded-xl p-6">
-              <h3 class="text-xl font-bold text-white">Equipos Totales</h3>
-              <p class="text-gray-400 text-sm">{{ stats.teams }} equipos registrados</p>
+            <div class="bg-gradient-to-br from-cyan-900/20 to-cyan-700/20 border border-cyan-800 rounded-xl p-6 hover:scale-105 transition-all duration-300">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-xl font-bold text-white">Equipos Totales</h3>
+                  <p class="text-gray-400 text-sm">{{ stats.teams }} equipos registrados</p>
+                </div>
+                <i class="fas fa-shield-alt text-cyan-500 text-4xl"></i>
+              </div>
             </div>
-            <div class="bg-darker border border-gray-800 rounded-xl p-6">
-              <h3 class="text-xl font-bold text-white">Promedio Win Rate</h3>
-              <p class="text-gray-400 text-sm">{{ "%.1f"|format(stats.avg_team_win_rate) }}%</p>
+            <div class="bg-gradient-to-br from-green-900/20 to-green-700/20 border border-green-800 rounded-xl p-6 hover:scale-105 transition-all duration-300">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-xl font-bold text-white">Promedio Win Rate</h3>
+                  <p class="text-green-400 text-2xl font-bold">{{ "%.1f"|format(stats.avg_team_win_rate) }}%</p>
+                </div>
+                <i class="fas fa-percentage text-green-500 text-4xl"></i>
+              </div>
             </div>
-            <div class="bg-darker border border-gray-800 rounded-xl p-6">
-              <h3 class="text-xl font-bold text-white">Duración Promedio</h3>
-              <p class="text-gray-400 text-sm">{{ stats.avg_team_duration }}</p>
+            <div class="bg-gradient-to-br from-yellow-900/20 to-yellow-700/20 border border-yellow-800 rounded-xl p-6 hover:scale-105 transition-all duration-300">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-xl font-bold text-white">Duración Promedio</h3>
+                  <p class="text-yellow-400 text-2xl font-bold">{{ stats.avg_team_duration }}</p>
+                </div>
+                <i class="fas fa-clock text-yellow-500 text-4xl"></i>
+              </div>
             </div>
           </div>
 
-          <div class="bg-darker border border-gray-800 rounded-xl p-6">
+          <div class="bg-darker border border-gray-800 rounded-xl p-6 hover:border-cyan-600 transition-all duration-300">
             <div class="overflow-x-auto">
               <table class="w-full text-sm">
                 <thead>
@@ -320,22 +527,54 @@
                     <th class="py-3 px-4 text-left">KDA Prom.</th>
                     <th class="py-3 px-4 text-left">Duración Prom.</th>
                     <th class="py-3 px-4 text-left">Campeones Favoritos</th>
+                    <th class="py-3 px-4 text-left">Performance</th>
                   </tr>
                 </thead>
                 <tbody>
                   {% for team in equipos %}
-                  <tr class="border-b border-gray-800 match-row">
-                    <td class="py-3 px-4 font-semibold text-white">{{ team['name'] }}</td>
-                    <td class="py-3 px-4 text-gray-300">{{ team['region'] }}</td>
+                  <tr class="border-b border-gray-800 match-row cursor-pointer">
                     <td class="py-3 px-4">
-                      <span class="text-secondary font-bold">{{ team['wins'] }}W</span>
+                      <div class="flex items-center">
+                        <i class="fas fa-shield-alt text-cyan-500 mr-2"></i>
+                        <span class="font-bold text-white">{{ team['name'] }}</span>
+                      </div>
+                    </td>
+                    <td class="py-3 px-4">
+                      <span class="px-2 py-1 bg-gray-900/50 text-gray-300 rounded text-xs">{{ team['region'] }}</span>
+                    </td>
+                    <td class="py-3 px-4">
+                      <span class="text-green-400 font-bold">{{ team['wins'] }}W</span>
                       <span class="text-gray-500"> / </span>
                       <span class="text-red-400 font-bold">{{ team['losses'] }}L</span>
                     </td>
-                    <td class="py-3 px-4 text-gray-300">{{ "%.1f"|format(team['win_rate']) }}%</td>
-                    <td class="py-3 px-4 text-accent">{{ "%.2f"|format(team['avg_kda']) }}</td>
+                    <td class="py-3 px-4">
+                      {% if team['win_rate'] >= 60 %}
+                        <span class="badge-success">{{ "%.1f"|format(team['win_rate']) }}%</span>
+                      {% elif team['win_rate'] >= 40 %}
+                        <span class="badge-warning">{{ "%.1f"|format(team['win_rate']) }}%</span>
+                      {% else %}
+                        <span class="badge-danger">{{ "%.1f"|format(team['win_rate']) }}%</span>
+                      {% endif %}
+                    </td>
+                    <td class="py-3 px-4">
+                      <span class="text-yellow-400 font-bold">{{ "%.2f"|format(team['avg_kda']) }}</span>
+                    </td>
                     <td class="py-3 px-4 text-gray-300">{{ team['avg_duration'] }}</td>
                     <td class="py-3 px-4 text-gray-400 text-xs">{{ team['favorite_champions'] or "-" }}</td>
+                    <td class="py-3 px-4">
+                      {% set total_games = team['wins'] + team['losses'] %}
+                      {% if team['win_rate'] >= 60 and total_games >= 5 %}
+                        <span class="px-2 py-1 bg-green-900/50 text-green-300 rounded text-xs">
+                          <i class="fas fa-star"></i> EXCELENTE
+                        </span>
+                      {% elif team['win_rate'] >= 50 %}
+                        <span class="px-2 py-1 bg-blue-900/50 text-blue-300 rounded text-xs">
+                          <i class="fas fa-check"></i> BUENO
+                        </span>
+                      {% else %}
+                        <span class="px-2 py-1 bg-gray-900/50 text-gray-400 rounded text-xs">REGULAR</span>
+                      {% endif %}
+                    </td>
                   </tr>
                   {% endfor %}
                 </tbody>
@@ -350,24 +589,39 @@
 
         <!-- TAB: JUGADORES -->
         <section id="tab-players" class="tab-section p-6 space-y-6">
-          <h1 class="text-3xl font-bold mb-4">Jugadores Worlds 2024</h1>
+          <h1 class="text-3xl font-bold mb-4 bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">Jugadores Worlds 2024</h1>
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            <div class="bg-darker border border-gray-800 rounded-xl p-6">
-              <h3 class="text-xl font-bold text-white">Jugadores Totales</h3>
-              <p class="text-gray-400 text-sm">{{ stats.players }} jugadores registrados</p>
+            <div class="bg-gradient-to-br from-green-900/20 to-green-700/20 border border-green-800 rounded-xl p-6 hover:scale-105 transition-all duration-300">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-xl font-bold text-white">Jugadores Totales</h3>
+                  <p class="text-gray-400 text-sm">{{ stats.players }} jugadores registrados</p>
+                </div>
+                <i class="fas fa-user-ninja text-green-500 text-4xl"></i>
+              </div>
             </div>
-            <div class="bg-darker border border-gray-800 rounded-xl p-6">
-              <h3 class="text-xl font-bold text-white">Promedio Win Rate</h3>
-              <p class="text-gray-400 text-sm">{{ "%.1f"|format(stats.avg_player_win_rate) }}%</p>
+            <div class="bg-gradient-to-br from-blue-900/20 to-blue-700/20 border border-blue-800 rounded-xl p-6 hover:scale-105 transition-all duration-300">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-xl font-bold text-white">Promedio Win Rate</h3>
+                  <p class="text-blue-400 text-2xl font-bold">{{ "%.1f"|format(stats.avg_player_win_rate) }}%</p>
+                </div>
+                <i class="fas fa-chart-line text-blue-500 text-4xl"></i>
+              </div>
             </div>
-            <div class="bg-darker border border-gray-800 rounded-xl p-6">
-              <h3 class="text-xl font-bold text-white">Promedio KDA</h3>
-              <p class="text-gray-400 text-sm">{{ "%.2f"|format(stats.avg_player_kda) }}</p>
+            <div class="bg-gradient-to-br from-yellow-900/20 to-yellow-700/20 border border-yellow-800 rounded-xl p-6 hover:scale-105 transition-all duration-300">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-xl font-bold text-white">Promedio KDA</h3>
+                  <p class="text-yellow-400 text-2xl font-bold">{{ "%.2f"|format(stats.avg_player_kda) }}</p>
+                </div>
+                <i class="fas fa-crosshairs text-yellow-500 text-4xl"></i>
+              </div>
             </div>
           </div>
 
-          <div class="bg-darker border border-gray-800 rounded-xl p-6">
+          <div class="bg-darker border border-gray-800 rounded-xl p-6 hover:border-green-600 transition-all duration-300">
             <div class="overflow-x-auto">
               <table class="w-full text-sm">
                 <thead>
@@ -375,19 +629,66 @@
                     <th class="py-3 px-4 text-left">Nickname</th>
                     <th class="py-3 px-4 text-left">Nombre Real</th>
                     <th class="py-3 px-4 text-left">Rol</th>
+                    <th class="py-3 px-4 text-left">KDA</th>
                     <th class="py-3 px-4 text-left">País</th>
                     <th class="py-3 px-4 text-left">Equipo</th>
                   </tr>
                 </thead>
                 <tbody>
                   {% for player in jugadores %}
-                  <tr class="border-b border-gray-800 match-row">
-                    <td class="py-3 px-4 font-semibold text-white">{{ player.nickname }}</td>
+                  <tr class="border-b border-gray-800 match-row cursor-pointer">
+                    <td class="py-3 px-4">
+                      <div class="flex items-center">
+                        <i class="fas fa-user-circle text-green-500 mr-2"></i>
+                        <span class="font-bold text-white">{{ player.nickname }}</span>
+                      </div>
+                    </td>
                     <td class="py-3 px-4 text-gray-300">{{ player.real_name or "-" }}</td>
-                    <td class="py-3 px-4 text-gray-300">{{ player.role }}</td>
-                    <td class="py-3 px-4 text-gray-300">{{ player.country or "-" }}</td>
-                    <td class="py-3 px-4 text-gray-300">
-                      {% if player.team %}{{ player.team.name }}{% else %}-{% endif %}
+                    <td class="py-3 px-4">
+                      {% if player.role == 'Top' %}
+                        <span class="px-2 py-1 bg-red-900/50 text-red-300 rounded text-xs">
+                          <i class="fas fa-mountain"></i> {{ player.role }}
+                        </span>
+                      {% elif player.role == 'Jungle' %}
+                        <span class="px-2 py-1 bg-green-900/50 text-green-300 rounded text-xs">
+                          <i class="fas fa-tree"></i> {{ player.role }}
+                        </span>
+                      {% elif player.role == 'Mid' %}
+                        <span class="px-2 py-1 bg-purple-900/50 text-purple-300 rounded text-xs">
+                          <i class="fas fa-star"></i> {{ player.role }}
+                        </span>
+                      {% elif player.role == 'ADC' %}
+                        <span class="px-2 py-1 bg-yellow-900/50 text-yellow-300 rounded text-xs">
+                          <i class="fas fa-crosshairs"></i> {{ player.role }}
+                        </span>
+                      {% elif player.role == 'Support' %}
+                        <span class="px-2 py-1 bg-cyan-900/50 text-cyan-300 rounded text-xs">
+                          <i class="fas fa-hands-helping"></i> {{ player.role }}
+                        </span>
+                      {% else %}
+                        <span class="px-2 py-1 bg-gray-900/50 text-gray-300 rounded text-xs">{{ player.role }}</span>
+                      {% endif %}
+                    </td>
+                    <td class="py-3 px-4">
+                      {% if player.kda >= 4.0 %}
+                        <span class="text-green-400 font-bold">{{ "%.2f"|format(player.kda) }} <i class="fas fa-arrow-up text-xs"></i></span>
+                      {% elif player.kda >= 2.5 %}
+                        <span class="text-yellow-400 font-bold">{{ "%.2f"|format(player.kda) }}</span>
+                      {% else %}
+                        <span class="text-gray-400 font-bold">{{ "%.2f"|format(player.kda) }}</span>
+                      {% endif %}
+                    </td>
+                    <td class="py-3 px-4">
+                      <span class="text-gray-300">{{ player.country or "-" }}</span>
+                    </td>
+                    <td class="py-3 px-4">
+                      {% if player.team %}
+                        <span class="px-2 py-1 bg-cyan-900/30 text-cyan-300 rounded text-xs">
+                          <i class="fas fa-shield-alt"></i> {{ player.team.name }}
+                        </span>
+                      {% else %}
+                        <span class="text-gray-500">-</span>
+                      {% endif %}
                     </td>
                   </tr>
                   {% endfor %}
@@ -403,36 +704,82 @@
 
         <!-- TAB: PARTIDAS -->
         <section id="tab-matches" class="tab-section p-6 space-y-6">
-          <h1 class="text-3xl font-bold mb-4">Partidas Worlds 2024</h1>
+          <h1 class="text-3xl font-bold mb-4 bg-gradient-to-r from-pink-400 to-red-400 bg-clip-text text-transparent">Partidas Worlds 2024</h1>
 
-          <div class="bg-darker border border-gray-800 rounded-xl p-6">
-            <h3 class="text-lg font-bold mb-4">Historial de Matches</h3>
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div class="bg-gradient-to-br from-pink-900/20 to-pink-700/20 border border-pink-800 rounded-xl p-6 hover:scale-105 transition-all duration-300">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-xl font-bold text-white">Total Partidas</h3>
+                  <p class="text-pink-400 text-2xl font-bold">{{ stats.matches }}</p>
+                </div>
+                <i class="fas fa-gamepad text-pink-500 text-4xl"></i>
+              </div>
+            </div>
+            <div class="bg-gradient-to-br from-purple-900/20 to-purple-700/20 border border-purple-800 rounded-xl p-6 hover:scale-105 transition-all duration-300">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-xl font-bold text-white">Equipos Activos</h3>
+                  <p class="text-purple-400 text-2xl font-bold">{{ stats.teams }}</p>
+                </div>
+                <i class="fas fa-users text-purple-500 text-4xl"></i>
+              </div>
+            </div>
+            <div class="bg-gradient-to-br from-red-900/20 to-red-700/20 border border-red-800 rounded-xl p-6 hover:scale-105 transition-all duration-300">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-xl font-bold text-white">Competencia</h3>
+                  <p class="text-red-400 text-lg font-bold">Worlds 2024</p>
+                </div>
+                <i class="fas fa-trophy text-red-500 text-4xl"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-darker border border-gray-800 rounded-xl p-6 hover:border-pink-600 transition-all duration-300">
+            <h3 class="text-lg font-bold mb-4 flex items-center">
+              <i class="fas fa-history text-pink-500 mr-2"></i>
+              Historial de Matches
+            </h3>
             <div class="space-y-3">
               {% for match in matches %}
-              <div class="bg-dark border border-gray-700 rounded-lg p-4 hover:border-primary transition">
+              <div class="bg-gradient-to-r from-gray-900/50 to-gray-800/50 border border-gray-700 rounded-lg p-4 hover:border-pink-600 hover:shadow-lg transition-all duration-300 cursor-pointer">
                 <div class="flex items-center justify-between">
                   <div class="flex-1">
                     <div class="flex items-center justify-between mb-2">
-                      <div class="text-sm">
-                        <span class="text-xs text-gray-500">Match #{{ match.id }}</span>
-                        <span class="text-xs text-primary ml-2">{{ match.stage }}</span>
+                      <div class="text-sm flex items-center gap-2">
+                        <span class="px-2 py-1 bg-gray-900/50 text-gray-400 rounded text-xs">
+                          Match #{{ match.id }}
+                        </span>
+                        <span class="px-2 py-1 bg-pink-900/50 text-pink-300 rounded text-xs font-bold">
+                          <i class="fas fa-flag"></i> {{ match.stage }}
+                        </span>
                       </div>
-                      <div class="text-xs text-gray-400">{{ "%.1f"|format(match.avg_duration_min) }} min</div>
+                      <div class="flex items-center text-xs text-gray-400">
+                        <i class="fas fa-clock mr-1"></i>
+                        {{ "%.1f"|format(match.avg_duration_min) }} min
+                      </div>
                     </div>
                     <div class="flex items-center justify-between">
                       <div class="flex items-center space-x-3">
-                        <span class="font-bold text-white {% if match.winner_name == match.team_a_name %}text-secondary{% endif %}">
+                        <span class="font-bold text-lg {% if match.winner_name == match.team_a_name %}text-green-400{% else %}text-gray-400{% endif %}">
+                          {% if match.winner_name == match.team_a_name %}
+                            <i class="fas fa-trophy text-yellow-500 mr-1"></i>
+                          {% endif %}
                           {{ match.team_a_name }}
                         </span>
-                        <span class="text-gray-500 text-sm">vs</span>
-                        <span class="font-bold text-white {% if match.winner_name == match.team_b_name %}text-secondary{% endif %}">
+                        <span class="text-gray-500 text-sm font-bold">VS</span>
+                        <span class="font-bold text-lg {% if match.winner_name == match.team_b_name %}text-green-400{% else %}text-gray-400{% endif %}">
+                          {% if match.winner_name == match.team_b_name %}
+                            <i class="fas fa-trophy text-yellow-500 mr-1"></i>
+                          {% endif %}
                           {{ match.team_b_name }}
                         </span>
                       </div>
                       <div class="text-right">
-                        <div class="text-xs text-gray-400">Ganador:</div>
-                        <div class="text-sm font-bold text-secondary">
-                          {{ match.winner_name }}
+                        <div class="text-xs text-gray-400 mb-1">Ganador</div>
+                        <div class="px-3 py-1 bg-green-900/50 text-green-300 rounded font-bold text-sm">
+                          <i class="fas fa-crown mr-1"></i>{{ match.winner_name }}
                         </div>
                       </div>
                     </div>
@@ -444,17 +791,18 @@
           </div>
         </section>
 
-        <!-- TAB: GESTIÓN (FORMS) -->
-        <section id="tab-management" class="tab-section p-6 space-y-6">
-          <h1 class="text-3xl font-bold mb-4">Gestión de Datos</h1>
-          <p class="text-gray-400 mb-6">Crea y administra equipos, jugadores, campeones y partidas</p>
+        <!-- TAB: CREAR EQUIPO -->
+        <section id="tab-add-team" class="tab-section p-6 space-y-6">
+          <div class="mb-6">
+            <h1 class="text-3xl font-bold mb-2 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Crear Nuevo Equipo</h1>
+            <p class="text-gray-400">Registra un nuevo equipo en el sistema</p>
+          </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            
+          <div class="max-w-2xl mx-auto">
             <!-- FORM: CREAR EQUIPO -->
-            <div class="bg-darker border border-gray-800 rounded-xl p-6">
+            <div class="bg-gradient-to-br from-cyan-900/10 to-cyan-800/10 border border-cyan-800 rounded-xl p-6 hover:border-cyan-600 transition-all duration-300">
               <h3 class="text-xl font-bold mb-4 flex items-center">
-                <i class="fas fa-shield-alt text-primary mr-2"></i>
+                <i class="fas fa-shield-alt text-cyan-500 mr-2"></i>
                 Crear Equipo
               </h3>
               <form id="form-team" class="space-y-4">
@@ -500,11 +848,21 @@
               </form>
               <div id="msg-team" class="mt-3 text-sm"></div>
             </div>
+          </div>
+        </section>
 
+        <!-- TAB: CREAR JUGADOR -->
+        <section id="tab-add-player" class="tab-section p-6 space-y-6">
+          <div class="mb-6">
+            <h1 class="text-3xl font-bold mb-2 bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">Crear Nuevo Jugador</h1>
+            <p class="text-gray-400">Registra un nuevo jugador en el sistema</p>
+          </div>
+
+          <div class="max-w-2xl mx-auto">
             <!-- FORM: CREAR JUGADOR -->
-            <div class="bg-darker border border-gray-800 rounded-xl p-6">
+            <div class="bg-gradient-to-br from-green-900/10 to-green-800/10 border border-green-800 rounded-xl p-6 hover:border-green-600 transition-all duration-300">
               <h3 class="text-xl font-bold mb-4 flex items-center">
-                <i class="fas fa-user-ninja text-primary mr-2"></i>
+                <i class="fas fa-user-ninja text-green-500 mr-2"></i>
                 Crear Jugador
               </h3>
               <form id="form-player" class="space-y-4">
@@ -544,10 +902,11 @@
                          class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none">
                 </div>
                 <div>
-                  <label class="block text-sm text-gray-400 mb-1">ID del Equipo</label>
-                  <input type="number" name="team_id" min="1"
-                         class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
-                         placeholder="1">
+                  <label class="block text-sm text-gray-400 mb-1">Equipo</label>
+                  <select name="team_id" id="select-player-team"
+                          class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none">
+                    <option value="">Sin equipo</option>
+                  </select>
                 </div>
                 <button type="submit" 
                         class="w-full bg-primary hover:bg-opacity-90 text-white font-bold py-3 rounded-lg transition">
@@ -556,11 +915,21 @@
               </form>
               <div id="msg-player" class="mt-3 text-sm"></div>
             </div>
+          </div>
+        </section>
 
+        <!-- TAB: CREAR CAMPEÓN -->
+        <section id="tab-add-champion" class="tab-section p-6 space-y-6">
+          <div class="mb-6">
+            <h1 class="text-3xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Crear Nuevo Campeón</h1>
+            <p class="text-gray-400">Registra un nuevo campeón en el sistema</p>
+          </div>
+
+          <div class="max-w-2xl mx-auto">
             <!-- FORM: CREAR CAMPEÓN -->
-            <div class="bg-darker border border-gray-800 rounded-xl p-6">
+            <div class="bg-gradient-to-br from-purple-900/10 to-purple-800/10 border border-purple-800 rounded-xl p-6 hover:border-purple-600 transition-all duration-300">
               <h3 class="text-xl font-bold mb-4 flex items-center">
-                <i class="fas fa-users text-primary mr-2"></i>
+                <i class="fas fa-users text-purple-500 mr-2"></i>
                 Crear Campeón
               </h3>
               <form id="form-champion" class="space-y-4">
@@ -604,11 +973,21 @@
               </form>
               <div id="msg-champion" class="mt-3 text-sm"></div>
             </div>
+          </div>
+        </section>
 
+        <!-- TAB: CREAR PARTIDA -->
+        <section id="tab-add-match" class="tab-section p-6 space-y-6">
+          <div class="mb-6">
+            <h1 class="text-3xl font-bold mb-2 bg-gradient-to-r from-pink-400 to-red-400 bg-clip-text text-transparent">Crear Nueva Partida</h1>
+            <p class="text-gray-400">Registra una nueva partida en el sistema</p>
+          </div>
+
+          <div class="max-w-2xl mx-auto">
             <!-- FORM: CREAR PARTIDA -->
-            <div class="bg-darker border border-gray-800 rounded-xl p-6">
+            <div class="bg-gradient-to-br from-pink-900/10 to-pink-800/10 border border-pink-800 rounded-xl p-6 hover:border-pink-600 transition-all duration-300">
               <h3 class="text-xl font-bold mb-4 flex items-center">
-                <i class="fas fa-gamepad text-primary mr-2"></i>
+                <i class="fas fa-gamepad text-pink-500 mr-2"></i>
                 Crear Partida
               </h3>
               <form id="form-match" class="space-y-4">
@@ -620,23 +999,26 @@
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-sm text-gray-400 mb-1">ID Equipo A</label>
-                    <input type="number" name="team_a_id" required min="1"
-                           class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
-                           placeholder="1">
+                    <label class="block text-sm text-gray-400 mb-1">Equipo A</label>
+                    <select name="team_a_id" id="select-team-a" required
+                            class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none">
+                      <option value="">Seleccionar equipo</option>
+                    </select>
                   </div>
                   <div>
-                    <label class="block text-sm text-gray-400 mb-1">ID Equipo B</label>
-                    <input type="number" name="team_b_id" required min="1"
-                           class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
-                           placeholder="2">
+                    <label class="block text-sm text-gray-400 mb-1">Equipo B</label>
+                    <select name="team_b_id" id="select-team-b" required
+                            class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none">
+                      <option value="">Seleccionar equipo</option>
+                    </select>
                   </div>
                 </div>
                 <div>
-                  <label class="block text-sm text-gray-400 mb-1">ID Ganador</label>
-                  <input type="number" name="winner_id" required min="1"
-                         class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
-                         placeholder="1">
+                  <label class="block text-sm text-gray-400 mb-1">Ganador</label>
+                  <select name="winner_id" id="select-winner" required
+                          class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none">
+                    <option value="">Seleccionar ganador</option>
+                  </select>
                 </div>
                 <div>
                   <label class="block text-sm text-gray-400 mb-1">Duración Promedio (minutos)</label>
@@ -651,7 +1033,6 @@
               </form>
               <div id="msg-match" class="mt-3 text-sm"></div>
             </div>
-
           </div>
         </section>
 
@@ -695,6 +1076,371 @@
     document.getElementById('toggle-sidebar').addEventListener('click', () => {
       const sidebar = document.getElementById('sidebar');
       sidebar.classList.toggle('hidden');
+    });
+
+    // === DATOS DESDE EL SERVIDOR ===
+    const teamsData = {{ equipos | tojson | safe }};
+    const playersData = {{ jugadores | tojson | safe }};
+    const championsData = {{ campeones | tojson | safe }};
+
+    // Función de inicialización
+    function initializeDashboard() {
+      try {
+        console.log('Equipos:', teamsData.length);
+        console.log('Jugadores:', playersData.length);
+        console.log('Campeones:', championsData.length);
+        
+        // Poblar selects
+        populateTeamSelects();
+        
+        // Calcular estadísticas avanzadas
+        calculateAdvancedStats();
+        
+        // Crear gráficas
+        createCharts();
+      } catch (error) {
+        console.error('Error inicializando dashboard:', error);
+      }
+    }
+
+    function populateTeamSelects() {
+      const selectPlayerTeam = document.getElementById('select-player-team');
+      const selectTeamA = document.getElementById('select-team-a');
+      const selectTeamB = document.getElementById('select-team-b');
+      const selectWinner = document.getElementById('select-winner');
+
+      teamsData.forEach(team => {
+        const option = `<option value="${team.id}">${team.name} (${team.region})</option>`;
+        selectPlayerTeam.innerHTML += option;
+        selectTeamA.innerHTML += option;
+        selectTeamB.innerHTML += option;
+        selectWinner.innerHTML += option;
+      });
+
+      // Actualizar select de ganador cuando cambien los equipos
+      selectTeamA.addEventListener('change', updateWinnerSelect);
+      selectTeamB.addEventListener('change', updateWinnerSelect);
+    }
+
+    function updateWinnerSelect() {
+      const teamAId = document.getElementById('select-team-a').value;
+      const teamBId = document.getElementById('select-team-b').value;
+      const selectWinner = document.getElementById('select-winner');
+      
+      selectWinner.innerHTML = '<option value="">Seleccionar ganador</option>';
+      
+      if (teamAId) {
+        const teamA = teamsData.find(t => t.id == teamAId);
+        if (teamA) {
+          selectWinner.innerHTML += `<option value="${teamA.id}">${teamA.name}</option>`;
+        }
+      }
+      
+      if (teamBId && teamBId !== teamAId) {
+        const teamB = teamsData.find(t => t.id == teamBId);
+        if (teamB) {
+          selectWinner.innerHTML += `<option value="${teamB.id}">${teamB.name}</option>`;
+        }
+      }
+    }
+
+    function calculateAdvancedStats() {
+      if (!teamsData || teamsData.length === 0) {
+        console.warn('No hay datos de equipos');
+        return;
+      }
+
+      // Mejor equipo (por win rate)
+      let bestTeam = null;
+      let bestWinRate = 0;
+      
+      teamsData.forEach(team => {
+        // Manejar tanto objetos como diccionarios
+        const wins = team.wins || team['wins'] || 0;
+        const losses = team.losses || team['losses'] || 0;
+        const totalGames = wins + losses;
+        
+        if (totalGames > 0) {
+          const winRate = team.win_rate || team['win_rate'] || ((wins / totalGames) * 100);
+          if (winRate > bestWinRate || (winRate === bestWinRate && wins > (bestTeam?.wins || 0))) {
+            bestWinRate = winRate;
+            bestTeam = team;
+          }
+        }
+      });
+
+      if (bestTeam) {
+        const teamName = bestTeam.name || bestTeam['name'];
+        const teamWins = bestTeam.wins || bestTeam['wins'] || 0;
+        const teamLosses = bestTeam.losses || bestTeam['losses'] || 0;
+        
+        document.getElementById('best-team-name').textContent = teamName;
+        document.getElementById('best-team-wins').textContent = teamWins;
+        document.getElementById('best-team-losses').textContent = teamLosses;
+        document.getElementById('best-team-winrate').textContent = bestWinRate.toFixed(1) + '%';
+      }
+
+      // Mejor jugador (por KDA)
+      if (playersData && playersData.length > 0) {
+        let bestPlayer = playersData.reduce((max, player) => {
+          const playerKda = player.kda || player['kda'] || 0;
+          const maxKda = max ? (max.kda || max['kda'] || 0) : 0;
+          return playerKda > maxKda ? player : max;
+        }, null);
+
+        if (bestPlayer) {
+          document.getElementById('best-player-name').textContent = bestPlayer.nickname || bestPlayer['nickname'];
+          document.getElementById('best-player-kda').textContent = (bestPlayer.kda || bestPlayer['kda'] || 0).toFixed(2);
+          document.getElementById('best-player-role').textContent = bestPlayer.role || bestPlayer['role'];
+        }
+      }
+
+      // Mejor campeón (por win rate)
+      if (championsData && championsData.length > 0) {
+        let bestChampion = championsData.reduce((max, champ) => {
+          const champWr = champ.win_rate || champ['win_rate'] || 0;
+          const maxWr = max ? (max.win_rate || max['win_rate'] || 0) : 0;
+          return champWr > maxWr ? champ : max;
+        }, null);
+
+        if (bestChampion) {
+          const champName = bestChampion.name || bestChampion['name'];
+          const champWinRate = bestChampion.win_rate || bestChampion['win_rate'] || 0;
+          const champPickRate = bestChampion.pick_rate || bestChampion['pick_rate'] || 0;
+          
+          document.getElementById('best-champion-name').textContent = champName;
+          document.getElementById('best-champion-winrate').textContent = (champWinRate * 100).toFixed(1) + '%';
+          document.getElementById('best-champion-pickrate').textContent = (champPickRate * 100).toFixed(1) + '%';
+        }
+      }
+    }
+
+    function createCharts() {
+      console.log('Creando gráficas...');
+      
+      if (!teamsData || teamsData.length === 0) {
+        console.error('No hay datos de equipos para las gráficas');
+        return;
+      }
+
+      // Gráfica 1: Top 5 Equipos por Victorias
+      const top5Teams = [...teamsData]
+        .sort((a, b) => {
+          const winsA = a.wins || a['wins'] || 0;
+          const winsB = b.wins || b['wins'] || 0;
+          return winsB - winsA;
+        })
+        .slice(0, 5);
+
+      console.log('Top 5 equipos:', top5Teams);
+
+      const chart1 = document.getElementById('chart-top-teams');
+      if (chart1) {
+        new Chart(chart1, {
+          type: 'bar',
+          data: {
+            labels: top5Teams.map(t => t.name || t['name']),
+            datasets: [{
+              label: 'Victorias',
+              data: top5Teams.map(t => t.wins || t['wins'] || 0),
+              backgroundColor: 'rgba(0, 194, 203, 0.8)',
+              borderColor: 'rgba(0, 194, 203, 1)',
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: { 
+                display: true,
+                labels: { color: '#9CA3AF' }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { color: '#9CA3AF' },
+                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+              },
+              x: {
+                ticks: { color: '#9CA3AF' },
+                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+              }
+            }
+          }
+        });
+      } else {
+        console.error('Canvas chart-top-teams no encontrado');
+      }
+
+      // Gráfica 2: Top 5 Campeones Pickeados/Baneados
+      if (championsData && championsData.length > 0) {
+        const top5Champions = [...championsData]
+          .sort((a, b) => {
+            const aTotal = (a.pick_rate || a['pick_rate'] || 0) + (a.ban_rate || a['ban_rate'] || 0);
+            const bTotal = (b.pick_rate || b['pick_rate'] || 0) + (b.ban_rate || b['ban_rate'] || 0);
+            return bTotal - aTotal;
+          })
+          .slice(0, 5);
+
+        const chart2 = document.getElementById('chart-champions');
+        if (chart2) {
+          new Chart(chart2, {
+            type: 'bar',
+            data: {
+              labels: top5Champions.map(c => c.name || c['name']),
+              datasets: [
+                {
+                  label: 'Pick Rate %',
+                  data: top5Champions.map(c => ((c.pick_rate || c['pick_rate'] || 0) * 100).toFixed(1)),
+                  backgroundColor: 'rgba(145, 70, 255, 0.8)',
+                  borderColor: 'rgba(145, 70, 255, 1)',
+                  borderWidth: 2
+                },
+                {
+                  label: 'Ban Rate %',
+                  data: top5Champions.map(c => ((c.ban_rate || c['ban_rate'] || 0) * 100).toFixed(1)),
+                  backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                  borderColor: 'rgba(239, 68, 68, 1)',
+                  borderWidth: 2
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: true,
+              plugins: {
+                legend: { 
+                  display: true,
+                  labels: { color: '#9CA3AF' }
+                }
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: { color: '#9CA3AF' },
+                  grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                },
+                x: {
+                  ticks: { color: '#9CA3AF' },
+                  grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                }
+              }
+            }
+          });
+        }
+      }
+
+      // Gráfica 3: Distribución de Roles
+      if (playersData && playersData.length > 0) {
+        const roleCount = {};
+        playersData.forEach(player => {
+          const role = player.role || player['role'];
+          if (role) {
+            roleCount[role] = (roleCount[role] || 0) + 1;
+          }
+        });
+
+        const chart3 = document.getElementById('chart-roles');
+        if (chart3 && Object.keys(roleCount).length > 0) {
+          new Chart(chart3, {
+            type: 'doughnut',
+            data: {
+              labels: Object.keys(roleCount),
+              datasets: [{
+                data: Object.values(roleCount),
+                backgroundColor: [
+                  'rgba(145, 70, 255, 0.8)',
+                  'rgba(0, 194, 203, 0.8)',
+                  'rgba(0, 150, 255, 0.8)',
+                  'rgba(34, 197, 94, 0.8)',
+                  'rgba(251, 191, 36, 0.8)'
+                ],
+                borderColor: [
+                  'rgba(145, 70, 255, 1)',
+                  'rgba(0, 194, 203, 1)',
+                  'rgba(0, 150, 255, 1)',
+                  'rgba(34, 197, 94, 1)',
+                  'rgba(251, 191, 36, 1)'
+                ],
+                borderWidth: 2
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: true,
+              plugins: {
+                legend: { 
+                  position: 'right',
+                  labels: { color: '#9CA3AF' }
+                }
+              }
+            }
+          });
+        }
+      }
+
+      // Gráfica 4: KDA Promedio por Equipo (Top 8)
+      const top8KDA = [...teamsData]
+        .sort((a, b) => {
+          const kdaA = a.avg_kda || a['avg_kda'] || 0;
+          const kdaB = b.avg_kda || b['avg_kda'] || 0;
+          return kdaB - kdaA;
+        })
+        .slice(0, 8);
+
+      const chart4 = document.getElementById('chart-kda');
+      if (chart4) {
+        new Chart(chart4, {
+          type: 'line',
+          data: {
+            labels: top8KDA.map(t => t.name || t['name']),
+            datasets: [{
+              label: 'KDA Promedio',
+              data: top8KDA.map(t => (t.avg_kda || t['avg_kda'] || 0).toFixed(2)),
+              backgroundColor: 'rgba(251, 191, 36, 0.2)',
+              borderColor: 'rgba(251, 191, 36, 1)',
+              borderWidth: 3,
+              fill: true,
+              tension: 0.4,
+              pointBackgroundColor: 'rgba(251, 191, 36, 1)',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+              pointRadius: 5,
+              pointHoverRadius: 7
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: { 
+                display: true,
+                labels: { color: '#9CA3AF' }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { color: '#9CA3AF' },
+                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+              },
+              x: {
+                ticks: { color: '#9CA3AF', maxRotation: 45, minRotation: 45 },
+                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+              }
+            }
+          }
+        });
+      }
+      
+      console.log('Gráficas creadas exitosamente');
+    }
+
+    // Inicializar dashboard cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeDashboard();
     });
 
     // === FORM HANDLING ===
@@ -798,13 +1544,14 @@
     document.getElementById('form-player').addEventListener('submit', async (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
+      const teamId = formData.get('team_id');
       const data = {
         nickname: formData.get('nickname'),
         real_name: formData.get('real_name') || null,
         role: formData.get('role'),
         country: formData.get('country') || null,
         kda: parseFloat(formData.get('kda')),
-        team_id: formData.get('team_id') ? parseInt(formData.get('team_id')) : null
+        team_id: teamId && teamId !== '' ? parseInt(teamId) : null
       };
 
       try {

@@ -1,5 +1,20 @@
 /* styles.css */
 
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(145, 70, 255, 0.3); }
+    50% { box-shadow: 0 0 30px rgba(145, 70, 255, 0.6); }
+}
+
 .sidebar-menu-item {
     transition: all 0.3s ease;
     position: relative;
@@ -7,6 +22,7 @@
 .sidebar-menu-item:hover {
     background: rgba(145, 70, 255, 0.1);
     border-left: 3px solid #9146FF;
+    transform: translateX(5px);
 }
 .sidebar-menu-item.active {
     background: rgba(145, 70, 255, 0.2);
@@ -15,15 +31,19 @@
 }
 .neon-border {
     box-shadow: 0 0 20px rgba(145, 70, 255, 0.3);
+    animation: glow 3s infinite;
 }
 .match-row:hover {
     background: rgba(145, 70, 255, 0.05);
+    transform: scale(1.01);
+    transition: all 0.2s ease;
 }
 .tab-section {
     display: none;
 }
 .tab-section.active {
     display: block;
+    animation: slideIn 0.5s ease;
 }
 .filters {
     background: #050505;
@@ -56,4 +76,44 @@
 }
 .filters button:hover {
     background: #7c3ae0;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(145, 70, 255, 0.4);
+}
+
+/* Badges */
+.badge-success {
+    background: linear-gradient(135deg, #10b981, #059669);
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: white;
+}
+
+.badge-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: white;
+}
+
+.badge-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: white;
+}
+
+/* Hover effects */
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(145, 70, 255, 0.3);
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
