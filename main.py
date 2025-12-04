@@ -1,30 +1,23 @@
 from fastapi import FastAPI, Depends, HTTPException, Query, Request
-from sqlmodel import Session
-from utils.db import get_session, crear_db
-from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from sqlmodel import Session
 from typing import List
+from utils.db import get_session, crear_db
 from data.models import Champion, Team, MatchSummary, Player
 from operations.operations_db import (
-
     crear_campeon, listar_campeones, listar_campeones_eliminados, restaurar_campeon,
-    buscar_campeon_por_nombre, filtrar_campeones_por_winrate,
-    obtener_campeon, actualizar_campeon, eliminar_campeon,
-
+    buscar_campeon_por_nombre, filtrar_campeones_por_winrate, obtener_campeon, actualizar_campeon, eliminar_campeon,
     crear_equipo, listar_equipos, listar_equipos_eliminados, restaurar_equipo,
-    buscar_equipo_por_nombre, filtrar_equipo_por_region,
-    obtener_equipo, actualizar_equipo, eliminar_equipo,
-
+    buscar_equipo_por_nombre, filtrar_equipo_por_region, obtener_equipo, actualizar_equipo, eliminar_equipo,
     crear_resumen, listar_resumenes, listar_resumenes_eliminados, restaurar_resumen,
     buscar_resumen_por_etapa, filtrar_resumen_por_ganador,
-
     crear_jugador, listar_jugadores, listar_jugadores_eliminados, restaurar_jugador,
     buscar_jugadores_por_nickname, filtrar_jugadores_por_rol, filtrar_jugadores_por_equipo,
     obtener_jugador, actualizar_jugador, eliminar_jugador,
 )
 
-# CONFIGURACIÓN FASTAPI
 app = FastAPI(
     title="LoL Worlds API",
     description="API para gestión y análisis de campeones, equipos y partidas del Mundial de League of Legends",
@@ -37,16 +30,13 @@ templates = Jinja2Templates(directory="templates")
 # Archivos estáticos (CSS, imágenes, JS)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-
 @app.on_event("startup")
 def on_startup():
     crear_db()
 
-
 @app.get("/health", tags=["Root"])
 def health():
     return {"status": "ok"}
-
 
 @app.get("/", response_class=HTMLResponse, tags=["Front"])
 def home(
