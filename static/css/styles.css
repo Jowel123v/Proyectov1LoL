@@ -1,97 +1,58 @@
-body {
-    font-family: 'Rajdhani', sans-serif;
-    background-color: #050505;
-    color: #d1d5db;
-}
-
-a {
-    text-decoration: none;
-}
-
-button {
-    cursor: pointer;
-}
-
 /* Sidebar */
-#sidebar {
-    background-color: #111;
-    border-right: 2px solid #333;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
 .sidebar-menu-item {
-    padding: 15px;
-    cursor: pointer;
-    transition: background 0.3s ease, color 0.3s ease;
+  transition: all 0.3s ease;
+  position: relative;
 }
-
 .sidebar-menu-item:hover {
-    background-color: rgba(145, 70, 255, 0.1);
-    color: #9146FF;
+  background: rgba(145, 70, 255, 0.1);
+  border-left: 3px solid #9146FF;
 }
-
 .sidebar-menu-item.active {
-    background-color: rgba(145, 70, 255, 0.2);
-    border-left: 3px solid #9146FF;
-    color: #9146FF;
+  background: rgba(145, 70, 255, 0.2);
+  border-left: 3px solid #9146FF;
+  color: #9146FF;
 }
-
-/* Header */
-header {
-    background-color: #111;
-    padding: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid #333;
-}
-
-/* Neon effects */
 .neon-border {
-    box-shadow: 0 0 15px rgba(145, 70, 255, 0.4);
+  box-shadow: 0 0 20px rgba(145, 70, 255, 0.3);
 }
-
-/* Tab Section */
+.match-row:hover {
+  background: rgba(145, 70, 255, 0.05);
+}
 .tab-section {
-    display: none;
+  display: none;
 }
-
 .tab-section.active {
-    display: block;
+  display: block;
 }
-
-/* Tables */
-table {
-    width: 100%;
-    border-collapse: collapse;
+.filters {
+  background: #050505;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
 }
-
-table th, table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #333;
+.filters label {
+  color: #9CA3AF;
+  font-size: 0.875rem;
 }
-
-table th {
-    background-color: #222;
+.filters input {
+  background: #0A0A0A;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 0.5rem;
+  color: white;
+  flex: 1;
 }
-
-table tr:hover {
-    background-color: rgba(145, 70, 255, 0.05);
+.filters button {
+  background: #9146FF;
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.3s;
 }
-
-/* Buttons */
-button {
-    background-color: #9146FF;
-    padding: 8px 16px;
-    border-radius: 5px;
-    color: white;
-    font-weight: bold;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    background-color: #7a3ed1;
+.filters button:hover {
+  background: #7c3ae0;
 }
