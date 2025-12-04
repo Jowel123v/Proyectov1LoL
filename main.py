@@ -3,21 +3,16 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from sqlmodel import Session
-from typing import List, Dict, Any, Optional
-# Importa tus modelos y funciones
+from typing import List
 from utils.db import get_session, crear_db
 from data.models import Champion, Team, MatchSummary, Player
 from operations.operations_db import (
-    # CAMPEONES
     crear_campeon, listar_campeones, listar_campeones_eliminados, restaurar_campeon,
     buscar_campeon_por_nombre, filtrar_campeones_por_winrate, obtener_campeon, actualizar_campeon, eliminar_campeon,
-    # EQUIPOS
     crear_equipo, listar_equipos, listar_equipos_eliminados, restaurar_equipo,
     buscar_equipo_por_nombre, filtrar_equipo_por_region, obtener_equipo, actualizar_equipo, eliminar_equipo,
-    # PARTIDAS
     crear_resumen, listar_resumenes, listar_resumenes_eliminados, restaurar_resumen,
     buscar_resumen_por_etapa, filtrar_resumen_por_ganador,
-    # JUGADORES
     crear_jugador, listar_jugadores, listar_jugadores_eliminados, restaurar_jugador,
     buscar_jugadores_por_nickname, filtrar_jugadores_por_rol, filtrar_jugadores_por_equipo,
     obtener_jugador, actualizar_jugador, eliminar_jugador,
@@ -35,73 +30,46 @@ templates = Jinja2Templates(directory="templates")
 # Archivos estáticos (CSS, imágenes, JS)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-
 @app.on_event("startup")
 def on_startup():
     crear_db()
 
-
 @app.get("/health", tags=["Root"])
 def health():
     return {"status": "ok"}
-
 
 @app.get("/", response_class=HTMLResponse, tags=["Front"])
 def home(
         request: Request,
         session: Session = Depends(get_session),
 ):
-    """Dashboard principal con todas las secciones integradas.
+    """Dashboard principal con todas las secciones integradas"""
 
-    Ajuste: Se calcula el win_rate y se añade a los equipos como diccionarios
-    para evitar el UndefinedError en la plantilla Jinja2.
-    """
-
-    # 1. Cargar TODOS los datos
+    # Cargar TODOS los datos
     equipos = listar_equipos(session, skip=0, limit=100, include_deleted=False)
     jugadores = listar_jugadores(session, skip=0, limit=200, include_deleted=False)
     campeones = listar_campeones(session, skip=0, limit=200, include_deleted=False)
     matches = listar_resumenes(session, skip=0, limit=500, include_deleted=False)
 
-    # 2. Procesamiento de Equipos: CÁLCULO DE WIN_RATE
-    equipos_con_stats: List[Dict[str, Any]] = []
-
-    for team in equipos:
-        total_matches = (team.wins or 0) + (team.losses or 0)
-
-        # Calcular el win_rate: Evita la división por cero
-        if total_matches > 0:
-            win_rate = (team.wins / total_matches) * 100
-        else:
-            win_rate = 0.0
-
-            # Convertir el objeto SQLModel a un diccionario y añadir la propiedad calculada
-        team_data = team.model_dump()
-        team_data['win_rate'] = f"{win_rate:.2f}%"  # Añadimos el win_rate formateado
-
-        equipos_con_stats.append(team_data)
-
-    # 3. Calcular estadísticas
+    # Calcular estadísticas
     stats = {
-        "teams": len(equipos_con_stats),
+        "teams": len(equipos),
         "players": len(jugadores),
         "champions": len(campeones),
         "matches": len(matches),
     }
 
-    # 4. Renderizar la plantilla
     return templates.TemplateResponse(
         "index.html",
         {
             "request": request,
             "stats": stats,
-            "equipos": equipos_con_stats,  # Usamos la lista de diccionarios con 'win_rate'
+            "equipos": equipos,
             "jugadores": jugadores,
             "campeones": campeones,
             "matches": matches,
         },
     )
-
 
 # CHAMPIONS  (orden: estáticas -> dinámicas)
 
@@ -110,22 +78,19 @@ def crear_nuevo_campeon(obj: Champion, session: Session = Depends(get_session)):
     # respuesta de creación NO incluye 'id' ni 'is_deleted' (se controla en operations)
     return crear_campeon(session, obj)
 
-
 @app.get("/champions/", response_model=List[Champion], tags=["Champions"])
 def listar_todos_los_campeones(
-        skip: int = 0,
-        limit: int = Query(10, le=100),
-        include_deleted: bool = Query(False, description="Incluir eliminados lógicamente"),
-        session: Session = Depends(get_session)
+    skip: int = 0,
+    limit: int = Query(10, le=100),
+    include_deleted: bool = Query(False, description="Incluir eliminados lógicamente"),
+    session: Session = Depends(get_session)
 ):
     return listar_campeones(session, skip=skip, limit=limit, include_deleted=include_deleted)
-
 
 # --- RUTAS ESTÁTICAS
 @app.get("/champions/deleted", response_model=List[Champion], tags=["Champions"])
 def listar_campeones_borrados(session: Session = Depends(get_session)):
     return listar_campeones_eliminados(session)
-
 
 @app.post("/champions/{champion_id}/restore", tags=["Champions"])
 def restaurar_campeon_por_id(champion_id: int, session: Session = Depends(get_session)):
@@ -133,28 +98,22 @@ def restaurar_campeon_por_id(champion_id: int, session: Session = Depends(get_se
         return {"message": "Campeón restaurado correctamente"}
     raise HTTPException(status_code=404, detail="No fue posible restaurar el campeón")
 
-
 @app.get("/champions/search/", response_model=List[Champion], tags=["Champions"])
 def buscar_campeon(nombre: str = Query(..., min_length=1), session: Session = Depends(get_session)):
     return buscar_campeon_por_nombre(session, nombre)
 
-
 @app.get("/champions/filter/winrate/", response_model=List[Champion], tags=["Champions"])
-def filtrar_campeones_por_winrate_minimo(min_winrate: float = Query(0.5, ge=0.0),
-                                         session: Session = Depends(get_session)):
+def filtrar_campeones_por_winrate_minimo(min_winrate: float = Query(0.5, ge=0.0), session: Session = Depends(get_session)):
     return filtrar_campeones_por_winrate(session, min_winrate)
-
 
 # --- RUTAS CON PARÁMETRO
 @app.get("/champions/{champion_id}", response_model=Champion, tags=["Champions"])
 def obtener_campeon_por_id(champion_id: int, session: Session = Depends(get_session)):
     return obtener_campeon(session, champion_id)
 
-
 @app.put("/champions/{champion_id}", response_model=Champion, tags=["Champions"])
 def actualizar_datos_campeon(champion_id: int, obj: Champion, session: Session = Depends(get_session)):
     return actualizar_campeon(session, champion_id, obj)
-
 
 @app.delete("/champions/{champion_id}", tags=["Champions"])
 def eliminar_campeon_por_id(champion_id: int, session: Session = Depends(get_session)):
@@ -169,22 +128,19 @@ def eliminar_campeon_por_id(champion_id: int, session: Session = Depends(get_ses
 def crear_nuevo_equipo(obj: Team, session: Session = Depends(get_session)):
     return crear_equipo(session, obj)
 
-
 @app.get("/teams/", response_model=List[Team], tags=["Teams"])
 def listar_todos_los_equipos(
-        skip: int = 0,
-        limit: int = Query(10, le=100),
-        include_deleted: bool = Query(False, description="Incluir eliminados lógicamente"),
-        session: Session = Depends(get_session)
+    skip: int = 0,
+    limit: int = Query(10, le=100),
+    include_deleted: bool = Query(False, description="Incluir eliminados lógicamente"),
+    session: Session = Depends(get_session)
 ):
     return listar_equipos(session, skip=skip, limit=limit, include_deleted=include_deleted)
-
 
 # --- RUTAS ESTÁTICAS (antes de /{team_id})
 @app.get("/teams/deleted", response_model=List[Team], tags=["Teams"])
 def listar_equipos_borrados(session: Session = Depends(get_session)):
     return listar_equipos_eliminados(session)
-
 
 @app.post("/teams/{team_id}/restore", tags=["Teams"])
 def restaurar_equipo_por_id(team_id: int, session: Session = Depends(get_session)):
@@ -192,11 +148,9 @@ def restaurar_equipo_por_id(team_id: int, session: Session = Depends(get_session
         return {"message": "Equipo restaurado correctamente"}
     raise HTTPException(status_code=404, detail="No fue posible restaurar el equipo")
 
-
 @app.get("/teams/search/", response_model=List[Team], tags=["Teams"])
 def buscar_equipo(nombre: str = Query(..., min_length=1), session: Session = Depends(get_session)):
     return buscar_equipo_por_nombre(session, nombre)
-
 
 @app.get("/teams/region/{region}", response_model=List[Team], tags=["Teams"])
 def filtrar_equipos_por_region(region: str, session: Session = Depends(get_session)):
@@ -205,17 +159,14 @@ def filtrar_equipos_por_region(region: str, session: Session = Depends(get_sessi
         raise HTTPException(status_code=404, detail=f"No hay equipos registrados en la región {region}")
     return equipos
 
-
 # --- RUTAS CON PARÁMETRO (al final)
 @app.get("/teams/{team_id}", response_model=Team, tags=["Teams"])
 def obtener_equipo_por_id(team_id: int, session: Session = Depends(get_session)):
     return obtener_equipo(session, team_id)
 
-
 @app.put("/teams/{team_id}", response_model=Team, tags=["Teams"])
 def actualizar_datos_equipo(team_id: int, obj: Team, session: Session = Depends(get_session)):
     return actualizar_equipo(session, team_id, obj)
-
 
 @app.delete("/teams/{team_id}", tags=["Teams"])
 def eliminar_equipo_por_id(team_id: int, session: Session = Depends(get_session)):
@@ -230,22 +181,19 @@ def eliminar_equipo_por_id(team_id: int, session: Session = Depends(get_session)
 def crear_nueva_partida(obj: MatchSummary, session: Session = Depends(get_session)):
     return crear_resumen(session, obj)
 
-
 @app.get("/matches/", response_model=List[MatchSummary], tags=["Matches"])
 def listar_todas_las_partidas(
-        skip: int = 0,
-        limit: int = Query(10, le=100),
-        include_deleted: bool = Query(False, description="Incluir eliminados lógicamente"),
-        session: Session = Depends(get_session)
+    skip: int = 0,
+    limit: int = Query(10, le=100),
+    include_deleted: bool = Query(False, description="Incluir eliminados lógicamente"),
+    session: Session = Depends(get_session)
 ):
     return listar_resumenes(session, skip=skip, limit=limit, include_deleted=include_deleted)
-
 
 # --- RUTAS ESTÁTICAS
 @app.get("/matches/deleted", response_model=List[MatchSummary], tags=["Matches"])
 def listar_partidas_borradas(session: Session = Depends(get_session)):
     return listar_resumenes_eliminados(session)
-
 
 @app.post("/matches/{resumen_id}/restore", tags=["Matches"])
 def restaurar_partida_por_id(resumen_id: int, session: Session = Depends(get_session)):
@@ -253,11 +201,9 @@ def restaurar_partida_por_id(resumen_id: int, session: Session = Depends(get_ses
         return {"message": "Resumen restaurado correctamente"}
     raise HTTPException(status_code=404, detail="No fue posible restaurar el resumen")
 
-
 @app.get("/matches/search/", response_model=List[MatchSummary], tags=["Matches"])
 def buscar_partidas_por_etapa(etapa: str = Query(..., min_length=1), session: Session = Depends(get_session)):
     return buscar_resumen_por_etapa(session, etapa)
-
 
 @app.get("/matches/winner/{team_id}", response_model=List[MatchSummary], tags=["Matches"])
 def filtrar_partidas_por_ganador(team_id: int, session: Session = Depends(get_session)):
@@ -276,13 +222,12 @@ def crear_nuevo_jugador(obj: Player, session: Session = Depends(get_session)):
 
 @app.get("/players/", response_model=List[Player], tags=["Players"])
 def listar_todos_los_jugadores(
-        skip: int = 0,
-        limit: int = Query(10, le=100),
-        include_deleted: bool = Query(False, description="Incluir eliminados lógicamente"),
-        session: Session = Depends(get_session),
+    skip: int = 0,
+    limit: int = Query(10, le=100),
+    include_deleted: bool = Query(False, description="Incluir eliminados lógicamente"),
+    session: Session = Depends(get_session),
 ):
     return listar_jugadores(session, skip=skip, limit=limit, include_deleted=include_deleted)
-
 
 @app.get("/players/deleted", response_model=List[Player], tags=["Players"])
 def listar_jugadores_borrados(session: Session = Depends(get_session)):
@@ -300,8 +245,8 @@ def restaurar_jugador_por_id(player_id: int, session: Session = Depends(get_sess
 
 @app.get("/players/search/", response_model=List[Player], tags=["Players"])
 def buscar_jugadores(
-        nickname: str = Query(..., min_length=1),
-        session: Session = Depends(get_session),
+    nickname: str = Query(..., min_length=1),
+    session: Session = Depends(get_session),
 ):
     return buscar_jugadores_por_nickname(session, nickname)
 
@@ -331,9 +276,9 @@ def obtener_jugador_por_id(player_id: int, session: Session = Depends(get_sessio
 
 @app.put("/players/{player_id}", response_model=Player, tags=["Players"])
 def actualizar_datos_jugador(
-        player_id: int,
-        obj: Player,
-        session: Session = Depends(get_session),
+    player_id: int,
+    obj: Player,
+    session: Session = Depends(get_session),
 ):
     return actualizar_jugador(session, player_id, obj)
 
