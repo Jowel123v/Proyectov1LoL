@@ -51,12 +51,76 @@ def home(
     campeones = listar_campeones(session, skip=0, limit=200, include_deleted=False)
     matches = listar_resumenes(session, skip=0, limit=500, include_deleted=False)
 
+    # Agregar win_rate calculado a cada equipo para que Jinja2 pueda accederlo
+    equipos_con_winrate = []
+    total_team_win_rate = 0.0
+    total_team_duration = 0.0
+    teams_with_duration = 0
+    
+    for equipo in equipos:
+        # Convertir a dict y agregar win_rate calculado
+        equipo_dict = equipo.model_dump()
+        total_games = equipo.wins + equipo.losses
+        win_rate = (equipo.wins / total_games * 100) if total_games > 0 else 0.0
+        equipo_dict['win_rate'] = win_rate
+        total_team_win_rate += win_rate
+        
+        # Calcular duración promedio de las partidas de este equipo
+        team_matches = [m for m in matches if m.team_a_id == equipo.id or m.team_b_id == equipo.id]
+        if len(team_matches) > 0:
+            team_avg_duration = sum(m.avg_duration_min for m in team_matches) / len(team_matches)
+            equipo_dict['avg_duration'] = f"{team_avg_duration:.1f} min"
+            total_team_duration += team_avg_duration
+            teams_with_duration += 1
+        else:
+            equipo_dict['avg_duration'] = "-"
+        
+        equipos_con_winrate.append(equipo_dict)
+
+    # Calcular promedios de campeones
+    avg_champion_pick_rate = 0.0
+    avg_champion_win_rate = 0.0
+    if len(campeones) > 0:
+        total_pick_rate = sum(c.pick_rate for c in campeones)
+        total_win_rate = sum(c.win_rate for c in campeones)
+        avg_champion_pick_rate = (total_pick_rate / len(campeones)) * 100
+        avg_champion_win_rate = (total_win_rate / len(campeones)) * 100
+
+    # Calcular promedios de equipos
+    avg_team_win_rate = (total_team_win_rate / len(equipos)) if len(equipos) > 0 else 0.0
+    avg_team_duration = "-"
+    
+    if teams_with_duration > 0:
+        avg_team_duration = f"{(total_team_duration / teams_with_duration):.1f} min"
+
+    # Calcular promedios de jugadores (basados en el KDA promedio de sus equipos)
+    # Como no tenemos win_rate ni KDA individual por jugador, calculamos el promedio de los equipos
+    total_player_kda = 0.0
+    players_with_team = 0
+    
+    for jugador in jugadores:
+        if jugador.team_id:
+            # Buscar el equipo correspondiente
+            equipo = next((e for e in equipos if e.id == jugador.team_id), None)
+            if equipo:
+                total_player_kda += equipo.avg_kda
+                players_with_team += 1
+
+    avg_player_win_rate = avg_team_win_rate  # Usamos el mismo promedio que equipos
+    avg_player_kda = (total_player_kda / players_with_team) if players_with_team > 0 else 0.0
+
     # Calcular estadísticas
     stats = {
         "teams": len(equipos),
         "players": len(jugadores),
         "champions": len(campeones),
         "matches": len(matches),
+        "avg_champion_pick_rate": avg_champion_pick_rate,
+        "avg_champion_win_rate": avg_champion_win_rate,
+        "avg_team_win_rate": avg_team_win_rate,
+        "avg_team_duration": avg_team_duration,
+        "avg_player_win_rate": avg_player_win_rate,
+        "avg_player_kda": avg_player_kda,
     }
 
     return templates.TemplateResponse(
@@ -64,7 +128,7 @@ def home(
         {
             "request": request,
             "stats": stats,
-            "equipos": equipos,
+            "equipos": equipos_con_winrate,
             "jugadores": jugadores,
             "campeones": campeones,
             "matches": matches,

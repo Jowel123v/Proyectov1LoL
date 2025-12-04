@@ -58,16 +58,18 @@ class Team(TableBase, table=True):
     wins: int = Field(default=0)
     losses: int = Field(default=0)
     avg_kda: float = Field(default=0.0)
+    avg_duration: Optional[str] = Field(default="-", max_length=20, description="Duración promedio de partidas")
     favorite_champions: Optional[str] = Field(
         default=None,
         description="Lista de campeones favoritos (ej: 'Ahri, Lee Sin')",
     )
 
     @property
-    def win_rate(self):
+    def win_rate(self) -> float:
+        """Calcula el win rate basado en wins y losses"""
         total_games = self.wins + self.losses
         if total_games == 0:
-            return 0  # Evita la división por 0
+            return 0.0  # Evita la división por 0
         return (self.wins / total_games) * 100
 
     # Relaciones 1:N con MatchSummary
