@@ -46,21 +46,27 @@ def health():
     return {"status": "ok"}
 
 
-# RUTA PRINCIPAL - Página de inicio
 @app.get("/", response_class=HTMLResponse, tags=["Front"])
-def home(request: Request, session: Session = Depends(get_session)):
-    equipos = listar_equipos(session, skip=0, limit=50, include_deleted=False)
+def home(
+        request: Request,
+        session: Session = Depends(get_session),
+):
+    """Dashboard principal con todas las secciones integradas"""
+
+    # Cargar TODOS los datos
+    equipos = listar_equipos(session, skip=0, limit=100, include_deleted=False)
     jugadores = listar_jugadores(session, skip=0, limit=200, include_deleted=False)
     campeones = listar_campeones(session, skip=0, limit=200, include_deleted=False)
     matches = listar_resumenes(session, skip=0, limit=500, include_deleted=False)
 
-    # Calcular estadísticas para la tarjeta superior
+    # Calcular estadísticas
     stats = {
         "teams": len(equipos),
         "players": len(jugadores),
         "champions": len(campeones),
         "matches": len(matches),
     }
+
     return templates.TemplateResponse(
         "index.html",
         {
@@ -72,178 +78,6 @@ def home(request: Request, session: Session = Depends(get_session)):
             "matches": matches,
         },
     )
-
-
-# Funciones de Cálculo para las Estadísticas
-
-def calcular_promedio_win_rate(items):
-    """Calcula el promedio de la tasa de victorias"""
-    if not items:
-        return 0
-    return sum(item.win_rate for item in items) / len(items)
-
-
-def calcular_promedio_kda(jugadores):
-    """Calcula el promedio de KDA de los jugadores"""
-    if not jugadores:
-        return 0
-    return sum(player.kda for player in jugadores) / len(jugadores)
-
-
-def calcular_promedio_pick_rate(campeones):
-    """Calcula el promedio de pick rate de los campeones"""
-    if not campeones:
-        return 0
-    return sum(champion.pick_rate for champion in campeones) / len(campeones)
-
-
-def calcular_duracion_promedio(equipos):
-    """Calcula la duración promedio de las partidas de los equipos"""
-    if not equipos:
-        return 0
-    return sum(team.avg_duration for team in equipos) / len(equipos)
-
-
-# RUTA: Equipos
-@app.get("/teams-html", response_class=HTMLResponse, tags=["Front"])
-def pagina_equipos(request: Request, region: str | None = Query(default=None), session: Session = Depends(get_session)):
-    if region:
-        equipos = filtrar_equipo_por_region(session, region)
-    else:
-        equipos = listar_equipos(session, skip=0, limit=100, include_deleted=False)
-
-    # Calcular estadísticas
-    stats = {
-        "teams": len(equipos),
-        "avg_win_rate": calcular_promedio_win_rate(equipos),
-        "avg_duration": calcular_duracion_promedio(equipos),
-    }
-
-    return templates.TemplateResponse(
-        "teams.html",
-        {
-            "request": request,
-            "equipos": equipos,
-            "region": region,
-            "stats": stats,  # Pasar las estadísticas a la plantilla
-        },
-    )
-
-
-# RUTA: Jugadores
-@app.get("/players-html", response_class=HTMLResponse, tags=["Front"])
-def pagina_jugadores(request: Request, role: str | None = Query(default=None), session: Session = Depends(get_session)):
-    if role:
-        jugadores = filtrar_jugadores_por_rol(session, role)
-    else:
-        jugadores = listar_jugadores(session, skip=0, limit=200, include_deleted=False)
-
-    # Calcular estadísticas
-    stats = {
-        "players": len(jugadores),
-        "avg_win_rate": calcular_promedio_win_rate(jugadores),
-        "avg_kda": calcular_promedio_kda(jugadores),
-    }
-
-    return templates.TemplateResponse(
-        "players.html",
-        {
-            "request": request,
-            "jugadores": jugadores,
-            "role": role,
-            "stats": stats,  # Pasar las estadísticas a la plantilla
-        },
-    )
-
-
-# RUTA: Campeones
-@app.get("/champions-html", response_class=HTMLResponse, tags=["Front"])
-def pagina_campeones(request: Request, win_rate: float = Query(None), session: Session = Depends(get_session)):
-    campeones = listar_campeones(session, skip=0, limit=100, min_win_rate=win_rate)
-
-    # Calcular estadísticas
-    stats = {
-        "champions": len(campeones),
-        "avg_pick_rate": calcular_promedio_pick_rate(campeones),
-        "avg_win_rate": calcular_promedio_win_rate(campeones),
-    }
-
-    return templates.TemplateResponse("champions.html", {
-        "request": request,
-        "campeones": campeones,
-        "stats": stats,
-        "win_rate": win_rate,
-    })
-
-
-# ----- PÁGINAS HTML -----
-
-@app.get("/teams-html", response_class=HTMLResponse, tags=["Front"])
-def pagina_equipos(request: Request, region: str | None = Query(default=None), session: Session = Depends(get_session)):
-    if region:
-        equipos = filtrar_equipo_por_region(session, region)
-    else:
-        equipos = listar_equipos(session, skip=0, limit=100, include_deleted=False)
-
-    stats = {
-        "teams": len(equipos),
-        "avg_win_rate": calcular_promedio_win_rate(equipos),
-        "avg_duration": calcular_duracion_promedio(equipos),
-    }
-
-    return templates.TemplateResponse(
-        "teams.html",
-        {
-            "request": request,
-            "equipos": equipos,
-            "region": region,
-            "stats": stats,  # Pasar las estadísticas a la plantilla
-        },
-    )
-
-
-@app.get("/players-html", response_class=HTMLResponse, tags=["Front"])
-def pagina_jugadores(request: Request, role: str | None = Query(default=None), session: Session = Depends(get_session)):
-    if role:
-        jugadores = filtrar_jugadores_por_rol(session, role)
-    else:
-        jugadores = listar_jugadores(session, skip=0, limit=200, include_deleted=False)
-
-    stats = {
-        "players": len(jugadores),
-        "avg_win_rate": calcular_promedio_win_rate(jugadores),  # Necesitamos calcular el win rate promedio
-        "avg_kda": calcular_promedio_kda(jugadores),  # Calcular KDA promedio
-    }
-
-    return templates.TemplateResponse(
-        "players.html",
-        {
-            "request": request,
-            "jugadores": jugadores,
-            "role": role,
-            "stats": stats,
-        },
-    )
-
-
-@app.get("/champions-html", response_class=HTMLResponse, tags=["Front"])
-def pagina_campeones(request: Request, win_rate: float = Query(None), session: Session = Depends(get_session)):
-    campeones = listar_campeones(session, skip=0, limit=100, min_win_rate=win_rate)
-
-    # Calcular estadísticas para la página de campeones
-    stats = {
-        "champions": len(campeones),
-        "avg_pick_rate": calcular_promedio_pick_rate(campeones),
-        "avg_win_rate": calcular_promedio_win_rate(campeones),
-    }
-
-    return templates.TemplateResponse("champions.html", {
-        "request": request,
-        "campeones": campeones,
-        "stats": stats,
-        "win_rate": win_rate,  # Pasar el filtro de win rate
-    })
-
 
 # CHAMPIONS  (orden: estáticas -> dinámicas)
 
@@ -462,49 +296,3 @@ def eliminar_jugador_por_id(player_id: int, session: Session = Depends(get_sessi
     if eliminar_jugador(session, player_id):
         return {"message": "Jugador eliminado correctamente"}
     raise HTTPException(status_code=404, detail="Jugador no encontrado")
-
-# FORMULARIO HTML PARA CREAR JUGADOR
-
-@app.get("/players-html/new", response_class=HTMLResponse, tags=["Front"])
-def form_nuevo_jugador(
-    request: Request,
-    session: Session = Depends(get_session),
-):
-    # Necesitamos los equipos para llenar el <select>
-    equipos = listar_equipos(session, skip=0, limit=100, include_deleted=False)
-
-    return templates.TemplateResponse(
-        "player_form.html",
-        {
-            "request": request,
-            "equipos": equipos,
-        },
-    )
-
-
-@app.post("/players-html/new", response_class=HTMLResponse, tags=["Front"])
-async def crear_jugador_desde_form(
-    request: Request,
-    nickname: str = Form(...),
-    real_name: str = Form(""),
-    role: str = Form(...),
-    country: str = Form(""),
-    team_id: int = Form(...),
-    session: Session = Depends(get_session),
-):
-    # Construimos el objeto Player (modelo SQLModel)
-    obj = Player(
-        nickname=nickname,
-        real_name=real_name or None,
-        role=role,
-        country=country or None,
-        team_id=team_id,
-    )
-
-    crear_jugador(session, obj)
-
-    # Redirigimos a la lista de jugadores HTML
-    return RedirectResponse(
-        url="/players-html",
-        status_code=HTTP_303_SEE_OTHER,
-    )
