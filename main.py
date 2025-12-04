@@ -24,7 +24,7 @@ app = FastAPI(
     version="1.1",
 )
 
-# Templates Jinja2
+# Templates Jinja22
 templates = Jinja2Templates(directory="templates")
 
 # Archivos estáticos (CSS, imágenes, JS)
