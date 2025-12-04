@@ -20,7 +20,7 @@ from operations.operations_db import (
 
 app = FastAPI(
     title="LoL Worlds API",
-    description="API para gestión y análisis de campeones, equipos y partidas del Mundial de League of Legends",
+    description="API para gestión y análisis de campeones, equipos y partidas del Mundial de League of Legends.",
     version="1.1",
 )
 
@@ -123,6 +123,23 @@ def home(
         "avg_player_kda": avg_player_kda,
     }
 
+    # Agregar nombres de equipos a los matches para la visualización
+    matches_with_names = []
+    for match in matches:
+        match_dict = match.model_dump()
+        
+        # Buscar los nombres de los equipos
+        team_a = next((e for e in equipos if e.id == match.team_a_id), None)
+        team_b = next((e for e in equipos if e.id == match.team_b_id), None)
+        winner = next((e for e in equipos if e.id == match.winner_id), None)
+        
+        match_dict['team_a_name'] = team_a.name if team_a else f"Team {match.team_a_id}"
+        match_dict['team_b_name'] = team_b.name if team_b else f"Team {match.team_b_id}"
+        match_dict['winner_name'] = winner.name if winner else f"Team {match.winner_id}"
+        
+        matches_with_names.append(match_dict)
+
+    # Retornar la respuesta con los cálculos de los promedios
     return templates.TemplateResponse(
         "index.html",
         {
@@ -131,7 +148,7 @@ def home(
             "equipos": equipos_con_winrate,
             "jugadores": jugadores,
             "campeones": campeones,
-            "matches": matches,
+            "matches": matches_with_names,
         },
     )
 
