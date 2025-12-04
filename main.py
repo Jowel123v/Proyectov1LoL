@@ -1,43 +1,28 @@
-from typing import List
-from fastapi import FastAPI, Depends, HTTPException, Query
-from sqlmodel import SQLModel, Session, create_engine
-from fastapi import FastAPI, Depends, HTTPException, Request, Query
+from fastapi import FastAPI, Depends, HTTPException, Query, Request
+from sqlmodel import Session
+from utils.db import get_session, crear_db
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
-from utils.db import get_session, crear_db
-from fastapi import Form
-from fastapi.responses import RedirectResponse
-from starlette.status import HTTP_303_SEE_OTHER
-
-
-# Modelos
 from data.models import Champion, Team, MatchSummary, Player
-
-# Operaciones (con soft delete, historial, restaurar, búsquedas y filtros)
 from operations.operations_db import (
-    # Champions
+
     crear_campeon, listar_campeones, listar_campeones_eliminados, restaurar_campeon,
     buscar_campeon_por_nombre, filtrar_campeones_por_winrate,
     obtener_campeon, actualizar_campeon, eliminar_campeon,
 
-    # Teams
     crear_equipo, listar_equipos, listar_equipos_eliminados, restaurar_equipo,
     buscar_equipo_por_nombre, filtrar_equipo_por_region,
     obtener_equipo, actualizar_equipo, eliminar_equipo,
 
-    # Matches
     crear_resumen, listar_resumenes, listar_resumenes_eliminados, restaurar_resumen,
     buscar_resumen_por_etapa, filtrar_resumen_por_ganador,
 
-    # Players
     crear_jugador, listar_jugadores, listar_jugadores_eliminados, restaurar_jugador,
     buscar_jugadores_por_nickname, filtrar_jugadores_por_rol, filtrar_jugadores_por_equipo,
     obtener_jugador, actualizar_jugador, eliminar_jugador,
 )
 
 # CONFIGURACIÓN FASTAPI
-
 app = FastAPI(
     title="LoL Worlds API",
     description="API para gestión y análisis de campeones, equipos y partidas del Mundial de League of Legends",
@@ -50,32 +35,32 @@ templates = Jinja2Templates(directory="templates")
 # Archivos estáticos (CSS, imágenes, JS)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+
 @app.on_event("startup")
 def on_startup():
     crear_db()
+
 
 @app.get("/health", tags=["Root"])
 def health():
     return {"status": "ok"}
 
+
+# RUTA PRINCIPAL - Página de inicio
 @app.get("/", response_class=HTMLResponse, tags=["Front"])
-def home(
-    request: Request,
-    session: Session = Depends(get_session),
-):
+def home(request: Request, session: Session = Depends(get_session)):
     equipos = listar_equipos(session, skip=0, limit=50, include_deleted=False)
     jugadores = listar_jugadores(session, skip=0, limit=200, include_deleted=False)
     campeones = listar_campeones(session, skip=0, limit=200, include_deleted=False)
     matches = listar_resumenes(session, skip=0, limit=500, include_deleted=False)
 
-    # Stats para la tarjeta superior
+    # Calcular estadísticas para la tarjeta superior
     stats = {
         "teams": len(equipos),
         "players": len(jugadores),
         "champions": len(campeones),
         "matches": len(matches),
     }
-    print("enviados",stats)
     return templates.TemplateResponse(
         "index.html",
         {
@@ -88,11 +73,15 @@ def home(
         },
     )
 
+
+# Funciones de Cálculo para las Estadísticas
+
 def calcular_promedio_win_rate(items):
     """Calcula el promedio de la tasa de victorias"""
     if not items:
         return 0
     return sum(item.win_rate for item in items) / len(items)
+
 
 def calcular_promedio_kda(jugadores):
     """Calcula el promedio de KDA de los jugadores"""
@@ -100,17 +89,92 @@ def calcular_promedio_kda(jugadores):
         return 0
     return sum(player.kda for player in jugadores) / len(jugadores)
 
+
 def calcular_promedio_pick_rate(campeones):
     """Calcula el promedio de pick rate de los campeones"""
     if not campeones:
         return 0
     return sum(champion.pick_rate for champion in campeones) / len(campeones)
 
+
 def calcular_duracion_promedio(equipos):
     """Calcula la duración promedio de las partidas de los equipos"""
     if not equipos:
         return 0
     return sum(team.avg_duration for team in equipos) / len(equipos)
+
+
+# RUTA: Equipos
+@app.get("/teams-html", response_class=HTMLResponse, tags=["Front"])
+def pagina_equipos(request: Request, region: str | None = Query(default=None), session: Session = Depends(get_session)):
+    if region:
+        equipos = filtrar_equipo_por_region(session, region)
+    else:
+        equipos = listar_equipos(session, skip=0, limit=100, include_deleted=False)
+
+    # Calcular estadísticas
+    stats = {
+        "teams": len(equipos),
+        "avg_win_rate": calcular_promedio_win_rate(equipos),
+        "avg_duration": calcular_duracion_promedio(equipos),
+    }
+
+    return templates.TemplateResponse(
+        "teams.html",
+        {
+            "request": request,
+            "equipos": equipos,
+            "region": region,
+            "stats": stats,  # Pasar las estadísticas a la plantilla
+        },
+    )
+
+
+# RUTA: Jugadores
+@app.get("/players-html", response_class=HTMLResponse, tags=["Front"])
+def pagina_jugadores(request: Request, role: str | None = Query(default=None), session: Session = Depends(get_session)):
+    if role:
+        jugadores = filtrar_jugadores_por_rol(session, role)
+    else:
+        jugadores = listar_jugadores(session, skip=0, limit=200, include_deleted=False)
+
+    # Calcular estadísticas
+    stats = {
+        "players": len(jugadores),
+        "avg_win_rate": calcular_promedio_win_rate(jugadores),
+        "avg_kda": calcular_promedio_kda(jugadores),
+    }
+
+    return templates.TemplateResponse(
+        "players.html",
+        {
+            "request": request,
+            "jugadores": jugadores,
+            "role": role,
+            "stats": stats,  # Pasar las estadísticas a la plantilla
+        },
+    )
+
+
+# RUTA: Campeones
+@app.get("/champions-html", response_class=HTMLResponse, tags=["Front"])
+def pagina_campeones(request: Request, win_rate: float = Query(None), session: Session = Depends(get_session)):
+    campeones = listar_campeones(session, skip=0, limit=100, min_win_rate=win_rate)
+
+    # Calcular estadísticas
+    stats = {
+        "champions": len(campeones),
+        "avg_pick_rate": calcular_promedio_pick_rate(campeones),
+        "avg_win_rate": calcular_promedio_win_rate(campeones),
+    }
+
+    return templates.TemplateResponse("champions.html", {
+        "request": request,
+        "campeones": campeones,
+        "stats": stats,
+        "win_rate": win_rate,
+    })
+
 
 # ----- PÁGINAS HTML -----
 
