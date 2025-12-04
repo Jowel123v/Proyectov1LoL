@@ -163,6 +163,23 @@
     .animate-pulse {
       animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
+
+    /* Footer styles */
+    .footer {
+      background: linear-gradient(135deg, #0A0A0A 0%, #1a1a2e 100%);
+      border-top: 2px solid rgba(145, 70, 255, 0.3);
+      padding: 1.5rem 0;
+      margin-top: auto;
+    }
+
+    .footer a {
+      transition: all 0.3s ease;
+    }
+
+    .footer a:hover {
+      color: #9146FF;
+      text-shadow: 0 0 10px rgba(145, 70, 255, 0.5);
+    }
   </style>
 </head>
 <body class="dark bg-dark text-gray-200">
@@ -1094,6 +1111,25 @@
         </section>
 
       </main>
+
+      <!-- FOOTER -->
+      <footer class="footer">
+        <div class="container mx-auto px-6">
+          <div class="flex justify-center items-center">
+            <p class="text-gray-400 text-sm">
+              Desarrollado por 
+              <a href="https://github.com/Jowel123v/Proyectov1LoL" 
+                 target="_blank" 
+                 rel="noopener noreferrer"
+                 class="font-bold text-white hover:text-primary transition-colors duration-300">
+                <i class="fab fa-github mr-1"></i>Joel Marin
+              </a>
+              <span class="mx-2">•</span>
+              <span class="text-gray-500">2024</span>
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   </div>
 
