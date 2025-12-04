@@ -63,6 +63,13 @@ class Team(TableBase, table=True):
         description="Lista de campeones favoritos (ej: 'Ahri, Lee Sin')",
     )
 
+    @property
+    def win_rate(self):
+        total_games = self.wins + self.losses
+        if total_games == 0:
+            return 0  # Evita la división por 0
+        return (self.wins / total_games) * 100
+
     # Relaciones 1:N con MatchSummary
     matches_as_team_a: List["MatchSummary"] = Relationship(
         back_populates="team_a",
@@ -77,6 +84,7 @@ class Team(TableBase, table=True):
         sa_relationship_kwargs={"foreign_keys": "[MatchSummary.winner_id]"},
     )
     players: List["Player"] = Relationship(back_populates="team")
+
 
 class MatchSummary(TableBase, table=True):
     __tablename__ = "matchsummary"
