@@ -63,11 +63,12 @@ class Team(TableBase, table=True):
         description="Lista de campeones favoritos (ej: 'Ahri, Lee Sin')",
     )
 
+    # Nota: Esta propiedad no es visible para Jinja2 si el objeto no se convierte a dict/pydantic model.
     @property
     def win_rate(self):
         total_games = self.wins + self.losses
         if total_games == 0:
-            return 0  # Evita la división por 0
+            return 0
         return (self.wins / total_games) * 100
 
     # Relaciones 1:N con MatchSummary
@@ -143,6 +144,7 @@ class Player(TableBase, table=True):
     # Relación con Team
     team_id: Optional[int] = Field(default=None, foreign_key="team.id")
     team: Optional[Team] = Relationship(back_populates="players")
+    kda: float = Field(default=0.0, description="Promedio KDA del jugador")
 
 
 __all__ = [

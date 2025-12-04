@@ -208,38 +208,11 @@
             </div>
             <div class="bg-darker border border-gray-800 rounded-xl p-6">
               <h3 class="text-xl font-bold text-white">Promedio Pick Rate</h3>
-              <p class="text-gray-400 text-sm">-</p>
+              <p class="text-gray-400 text-sm">{{ total_pick_rate | round(2) }}%</p>
             </div>
             <div class="bg-darker border border-gray-800 rounded-xl p-6">
               <h3 class="text-xl font-bold text-white">Promedio Win Rate</h3>
-              <p class="text-gray-400 text-sm">-</p>
-            </div>
-          </div>
-
-          <div class="bg-darker border border-gray-800 rounded-xl p-6">
-            <div class="overflow-x-auto">
-              <table class="w-full text-sm">
-                <thead>
-                  <tr class="border-b border-gray-700 text-xs text-gray-400">
-                    <th class="py-3 px-4 text-left">Nombre</th>
-                    <th class="py-3 px-4 text-left">Pick Rate</th>
-                    <th class="py-3 px-4 text-left">Ban Rate</th>
-                    <th class="py-3 px-4 text-left">Win Rate</th>
-                    <th class="py-3 px-4 text-left">KDA</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for champion in campeones %}
-                  <tr class="border-b border-gray-800 match-row">
-                    <td class="py-3 px-4 font-semibold text-white">{{ champion.name }}</td>
-                    <td class="py-3 px-4 text-secondary">{{ "%.1f"|format(champion.pick_rate) }}%</td>
-                    <td class="py-3 px-4 text-red-400">{{ "%.1f"|format(champion.ban_rate) }}%</td>
-                    <td class="py-3 px-4 text-accent">{{ "%.1f"|format(champion.win_rate) }}%</td>
-                    <td class="py-3 px-4 text-gray-300">{{ "%.2f"|format(champion.kda) }}</td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
+              <p class="text-gray-400 text-sm">{{ total_win_rate | round(2) }}%</p>
             </div>
           </div>
         </section>
@@ -255,42 +228,11 @@
             </div>
             <div class="bg-darker border border-gray-800 rounded-xl p-6">
               <h3 class="text-xl font-bold text-white">Promedio Win Rate</h3>
-              <p class="text-gray-400 text-sm">-</p>
+              <p class="text-gray-400 text-sm">{{ total_win_rate_teams | round(2) }}%</p>
             </div>
             <div class="bg-darker border border-gray-800 rounded-xl p-6">
               <h3 class="text-xl font-bold text-white">Duración Promedio</h3>
-              <p class="text-gray-400 text-sm">-</p>
-            </div>
-          </div>
-
-          <div class="bg-darker border border-gray-800 rounded-xl p-6">
-            <div class="overflow-x-auto">
-              <table class="w-full text-sm">
-                <thead>
-                  <tr class="border-b border-gray-700 text-xs text-gray-400">
-                    <th class="py-3 px-4 text-left">Equipo</th>
-                    <th class="py-3 px-4 text-left">Región</th>
-                    <th class="py-3 px-4 text-left">W/L</th>
-                    <th class="py-3 px-4 text-left">Win Rate</th>
-                    <th class="py-3 px-4 text-left">Duración Prom.</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for team in equipos %}
-                  <tr class="border-b border-gray-800 match-row">
-                    <td class="py-3 px-4 font-semibold text-white">{{ team.name }}</td>
-                    <td class="py-3 px-4 text-gray-300">{{ team.region }}</td>
-                    <td class="py-3 px-4">
-                      <span class="text-secondary font-bold">{{ team.wins }}W</span>
-                      <span class="text-gray-500"> / </span>
-                      <span class="text-red-400 font-bold">{{ team.losses }}L</span>
-                    </td>
-                    <td class="py-3 px-4 text-gray-300">{{ "%.1f"|format(team.win_rate) }}%</td>
-                    <td class="py-3 px-4 text-gray-300">{{ team.avg_duration }}</td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
+              <p class="text-gray-400 text-sm">{{ total_avg_duration | round(1) }} minutos</p>
             </div>
           </div>
         </section>
@@ -306,40 +248,11 @@
             </div>
             <div class="bg-darker border border-gray-800 rounded-xl p-6">
               <h3 class="text-xl font-bold text-white">Promedio Win Rate</h3>
-              <p class="text-gray-400 text-sm">-</p>
+              <p class="text-gray-400 text-sm">{{ total_win_rate_players | round(2) }}%</p>
             </div>
             <div class="bg-darker border border-gray-800 rounded-xl p-6">
               <h3 class="text-xl font-bold text-white">Promedio KDA</h3>
-              <p class="text-gray-400 text-sm">-</p>
-            </div>
-          </div>
-
-          <div class="bg-darker border border-gray-800 rounded-xl p-6">
-            <div class="overflow-x-auto">
-              <table class="w-full text-sm">
-                <thead>
-                  <tr class="border-b border-gray-700 text-xs text-gray-400">
-                    <th class="py-3 px-4 text-left">Nickname</th>
-                    <th class="py-3 px-4 text-left">Nombre Real</th>
-                    <th class="py-3 px-4 text-left">Rol</th>
-                    <th class="py-3 px-4 text-left">País</th>
-                    <th class="py-3 px-4 text-left">Equipo</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for player in jugadores %}
-                  <tr class="border-b border-gray-800 match-row">
-                    <td class="py-3 px-4 font-semibold text-white">{{ player.nickname }}</td>
-                    <td class="py-3 px-4 text-gray-300">{{ player.real_name or "-" }}</td>
-                    <td class="py-3 px-4 text-gray-300">{{ player.role }}</td>
-                    <td class="py-3 px-4 text-gray-300">{{ player.country or "-" }}</td>
-                    <td class="py-3 px-4 text-gray-300">
-                      {% if player.team %}{{ player.team.name }}{% else %}-{% endif %}
-                    </td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
+              <p class="text-gray-400 text-sm">{{ total_kda_players | round(2) }}</p>
             </div>
           </div>
         </section>
@@ -356,12 +269,12 @@
                 <div class="flex items-center justify-between">
                   <div class="flex items-center space-x-4">
                     <div class="text-sm">
-                      <div class="font-bold text-white">Match #{{ match.id }}</div>
+                      <div class="font-bold text-white">Match #{{ loop.index }}</div>
                       <div class="text-xs text-gray-400">{{ match.stage }}</div>
                     </div>
                   </div>
                   <div class="text-right">
-                    <div class="text-xs text-gray-400">Winner Team ID: {{ match.winner_team_id }}</div>
+                    <div class="text-xs text-gray-400">Winner Team ID: {{ match.winner_id }}</div>
                     <div class="text-xs text-primary">{{ match.match_date }}</div>
                   </div>
                 </div>
