@@ -164,11 +164,23 @@ erDiagram
         int champion_id
     }
 
+    PLAYER {
+        int id
+        string nickname
+        string real_name
+        string role
+        string country
+        bool is_deleted
+        int team_id
+    }
+
     TEAM ||--o{ MATCHSUMMARY : team_a
     TEAM ||--o{ MATCHSUMMARY : team_b
     TEAM ||--o{ MATCHSUMMARY : winner
     MATCHSUMMARY ||--o{ MATCHCHAMPIONLINK : includes
     CHAMPION ||--o{ MATCHCHAMPIONLINK : appears
+    TEAM ||--o{ PLAYER : players
+
 ```
 
 > **Nota:** Los rótulos son descriptivos para el diagrama y no afectan el esquema real.
@@ -258,4 +270,5 @@ uvicorn main:app --reload
 * **Manejo de errores:** respuestas coherentes (400, 404, 409, 500) con mensajes claros.
 
 ---
+
 
