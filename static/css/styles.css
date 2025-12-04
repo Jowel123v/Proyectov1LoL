@@ -12,18 +12,25 @@
   border-left: 3px solid #9146FF;
   color: #9146FF;
 }
+
+/* Efectos y Estilos Generales */
 .neon-border {
+  /* Sombra para simular un borde de neón suave */
   box-shadow: 0 0 20px rgba(145, 70, 255, 0.3);
 }
 .match-row:hover {
   background: rgba(145, 70, 255, 0.05);
 }
+
+/* Reglas CRUCIALES para el Sistema de Pestañas (Tabs) */
 .tab-section {
-  display: none;
+  display: none; /* Oculta todas las secciones por defecto */
 }
 .tab-section.active {
-  display: block;
+  display: block; /* Muestra solo la sección que tiene la clase 'active' */
 }
+
+/* Estilos adicionales para filtros (si los implementas más tarde) */
 .filters {
   background: #050505;
   border: 1px solid #333;

@@ -343,9 +343,11 @@
       item.addEventListener('click', () => {
         const tabName = item.getAttribute('data-tab');
 
+        // 1. Desactivar el estilo 'active' del menú anterior y activar el nuevo
         menuItems.forEach(i => i.classList.remove('active'));
         item.classList.add('active');
 
+        // 2. Ocultar todas las secciones y mostrar la sección objetivo
         tabSections.forEach(section => section.classList.remove('active'));
         document.getElementById('tab-' + tabName).classList.add('active');
       });
@@ -354,25 +356,9 @@
     // Toggle sidebar
     document.getElementById('toggle-sidebar').addEventListener('click', () => {
       const sidebar = document.getElementById('sidebar');
-      // Asegura que no se oculte solo en pantallas grandes
-      if (window.innerWidth < 1024) {
-        sidebar.classList.toggle('hidden');
-      } else {
-        // En desktop, simplemente lo oculta y expande el contenido.
-        sidebar.classList.toggle('w-64');
-        sidebar.classList.toggle('w-0');
-        sidebar.classList.toggle('p-0');
-
-        // Esto es un placeholder para una implementación más compleja
-        // pero hace el efecto visible de colapsar
-        if (sidebar.classList.contains('w-0')) {
-          sidebar.style.minWidth = '0';
-        } else {
-          sidebar.style.minWidth = '16rem'; // 256px
-        }
-      }
+      // En este ejemplo, simplemente oculta/muestra la sidebar
+      sidebar.classList.toggle('hidden');
     });
-
   </script>
 </body>
 </html>
