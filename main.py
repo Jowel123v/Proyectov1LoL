@@ -51,7 +51,7 @@ def home(
     campeones = listar_campeones(session, skip=0, limit=200, include_deleted=False)
     matches = listar_resumenes(session, skip=0, limit=500, include_deleted=False)
 
-    # Calcular estadísticas
+    # Calcular estadísticas generales
     stats = {
         "teams": len(equipos),
         "players": len(jugadores),
@@ -59,18 +59,25 @@ def home(
         "matches": len(matches),
     }
 
-    # Calcular promedios de campeones
+    # Calcular el promedio de KDA de los jugadores
+    total_kda_players = 0
+    total_players = len(jugadores)
+
+    # Verificamos si el jugador tiene un atributo 'kda', si no lo tiene lo asignamos a 0
+    for player in jugadores:
+        # Usamos getattr para evitar el error de 'kda' no existente
+        total_kda_players += getattr(player, 'kda', 0)
+
+    total_kda_players = total_kda_players / total_players if total_players > 0 else 0
+
+    # Cálculos adicionales de promedios para campeones y equipos
     total_pick_rate = sum([champion.pick_rate for champion in campeones]) / len(campeones) if campeones else 0
     total_win_rate = sum([champion.win_rate for champion in campeones]) / len(campeones) if campeones else 0
-
-    # Calcular promedio de Win Rate y Duración Promedio de los equipos
     total_win_rate_teams = sum([team.wins / (team.wins + team.losses) * 100 for team in equipos if (team.wins + team.losses) > 0]) / len(equipos) if equipos else 0
     total_avg_duration = sum([match.avg_duration_min for match in matches]) / len(matches) if matches else 0
-
-    # Calcular promedio de Win Rate y KDA Promedio de los Jugadores
     total_win_rate_players = sum([player.team.wins / (player.team.wins + player.team.losses) * 100 for player in jugadores if player.team and (player.team.wins + player.team.losses) > 0]) / len(jugadores) if jugadores else 0
-    total_kda_players = sum([player.kda for player in jugadores]) / len(jugadores) if jugadores else 0
 
+    # Retornar la respuesta con los cálculos de los promedios
     return templates.TemplateResponse(
         "index.html",
         {

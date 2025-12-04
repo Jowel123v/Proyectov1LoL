@@ -143,6 +143,7 @@ class Player(TableBase, table=True):
     # Relación con Team
     team_id: Optional[int] = Field(default=None, foreign_key="team.id")
     team: Optional[Team] = Relationship(back_populates="players")
+    kda: float = Field(default=0.0, description="Promedio KDA del jugador")
 
 
 __all__ = [
