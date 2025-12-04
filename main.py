@@ -20,7 +20,7 @@ from operations.operations_db import (
 
 app = FastAPI(
     title="LoL Worlds API",
-    description="API para gestión y análisis de campeones, equipos y partidas del Mundial de League of Legends",
+    description="API para gestión y análisis de campeones, equipos y partidas del Mundial de League of Legends.",
     version="1.1",
 )
 
