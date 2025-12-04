@@ -59,6 +59,18 @@ def home(
         "matches": len(matches),
     }
 
+    # Calcular promedios de campeones
+    total_pick_rate = sum([champion.pick_rate for champion in campeones]) / len(campeones) if campeones else 0
+    total_win_rate = sum([champion.win_rate for champion in campeones]) / len(campeones) if campeones else 0
+
+    # Calcular promedio de Win Rate y Duración Promedio de los equipos
+    total_win_rate_teams = sum([team.wins / (team.wins + team.losses) * 100 for team in equipos if (team.wins + team.losses) > 0]) / len(equipos) if equipos else 0
+    total_avg_duration = sum([match.avg_duration_min for match in matches]) / len(matches) if matches else 0
+
+    # Calcular promedio de Win Rate y KDA Promedio de los Jugadores
+    total_win_rate_players = sum([player.team.wins / (player.team.wins + player.team.losses) * 100 for player in jugadores if player.team and (player.team.wins + player.team.losses) > 0]) / len(jugadores) if jugadores else 0
+    total_kda_players = sum([player.kda for player in jugadores]) / len(jugadores) if jugadores else 0
+
     return templates.TemplateResponse(
         "index.html",
         {
@@ -68,6 +80,12 @@ def home(
             "jugadores": jugadores,
             "campeones": campeones,
             "matches": matches,
+            "total_pick_rate": total_pick_rate,
+            "total_win_rate": total_win_rate,
+            "total_win_rate_teams": total_win_rate_teams,
+            "total_avg_duration": total_avg_duration,
+            "total_win_rate_players": total_win_rate_players,
+            "total_kda_players": total_kda_players,
         },
     )
 
