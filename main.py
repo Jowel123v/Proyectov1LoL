@@ -3,6 +3,7 @@ from sqlmodel import Session
 from utils.db import get_session, crear_db
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from data.models import Champion, Team, MatchSummary, Player
 from operations.operations_db import (
 
