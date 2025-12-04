@@ -91,6 +91,15 @@
     .filters button:hover {
       background: #7c3ae0;
     }
+    .navbar-link:hover, .navbar-link:focus {
+      background: rgba(145, 70, 255, 0.1);
+      color: #9146FF;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #9146FF;
+      box-shadow: 0 0 0 2px rgba(145, 70, 255, 0.2);
+    }
   </style>
 </head>
 <body class="dark bg-dark text-gray-200">
@@ -127,6 +136,10 @@
             <i class="fas fa-gamepad text-primary"></i>
             <span>Partidas</span>
           </li>
+          <li class="sidebar-menu-item px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="management">
+            <i class="fas fa-plus-circle text-primary"></i>
+            <span>Gestión</span>
+          </li>
         </ul>
       </nav>
 
@@ -138,19 +151,41 @@
 
     <!-- CONTENIDO -->
     <div class="flex-1 flex flex-col overflow-hidden">
-      <!-- TOPBAR -->
-      <header class="bg-darker py-3 px-6 border-b border-gray-800 flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-          <button id="toggle-sidebar" class="text-gray-400 hover:text-white">
-            <i class="fas fa-bars"></i>
-          </button>
-          <span class="text-gray-400 text-sm">Worlds 2024 · Dashboard</span>
-        </div>
-        <div class="flex items-center space-x-3 text-xs">
-          <a href="/docs" target="_blank"
-             class="px-3 py-1 rounded-full border border-gray-700 hover:border-primary hover:text-primary">
-            <i class="fas fa-code mr-1"></i> Ver API Docs
-          </a>
+      <!-- NAVBAR -->
+      <header class="bg-darker py-3 px-6 border-b border-gray-800">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-6">
+            <button id="toggle-sidebar" class="text-gray-400 hover:text-white">
+              <i class="fas fa-bars"></i>
+            </button>
+            <span class="text-gray-400 text-sm font-semibold">Worlds 2024 · Dashboard</span>
+            
+            <!-- Navbar Links -->
+            <nav class="hidden md:flex items-center space-x-4 text-sm">
+              <a href="#" class="navbar-link px-3 py-2 rounded-lg hover:bg-gray-800 hover:text-primary transition" data-tab="overview">
+                <i class="fas fa-home mr-1"></i> Inicio
+              </a>
+              <a href="#" class="navbar-link px-3 py-2 rounded-lg hover:bg-gray-800 hover:text-primary transition" data-tab="champions">
+                <i class="fas fa-users mr-1"></i> Campeones
+              </a>
+              <a href="#" class="navbar-link px-3 py-2 rounded-lg hover:bg-gray-800 hover:text-primary transition" data-tab="teams">
+                <i class="fas fa-shield-alt mr-1"></i> Equipos
+              </a>
+              <a href="#" class="navbar-link px-3 py-2 rounded-lg hover:bg-gray-800 hover:text-primary transition" data-tab="players">
+                <i class="fas fa-user-ninja mr-1"></i> Jugadores
+              </a>
+              <a href="#" class="navbar-link px-3 py-2 rounded-lg hover:bg-gray-800 hover:text-primary transition" data-tab="management">
+                <i class="fas fa-plus-circle mr-1"></i> Gestión
+              </a>
+            </nav>
+          </div>
+          
+          <div class="flex items-center space-x-3 text-xs">
+            <a href="/docs" target="_blank"
+               class="px-3 py-1 rounded-full border border-gray-700 hover:border-primary hover:text-primary transition">
+              <i class="fas fa-code mr-1"></i> API Docs
+            </a>
+          </div>
         </div>
       </header>
 
@@ -359,6 +394,10 @@
               </table>
             </div>
           </div>
+
+          <div class="bg-darker border border-gray-800 rounded-xl p-6 mt-6">
+            <img src="/static/img/imagen2.jpg" alt="Jugadores Destacados Worlds 2024" class="w-full h-auto object-cover rounded-lg border border-gray-700">
+          </div>
         </section>
 
         <!-- TAB: PARTIDAS -->
@@ -404,24 +443,250 @@
           </div>
         </section>
 
+        <!-- TAB: GESTIÓN (FORMS) -->
+        <section id="tab-management" class="tab-section p-6 space-y-6">
+          <h1 class="text-3xl font-bold mb-4">Gestión de Datos</h1>
+          <p class="text-gray-400 mb-6">Crea y administra equipos, jugadores, campeones y partidas</p>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- FORM: CREAR EQUIPO -->
+            <div class="bg-darker border border-gray-800 rounded-xl p-6">
+              <h3 class="text-xl font-bold mb-4 flex items-center">
+                <i class="fas fa-shield-alt text-primary mr-2"></i>
+                Crear Equipo
+              </h3>
+              <form id="form-team" class="space-y-4">
+                <div>
+                  <label class="block text-sm text-gray-400 mb-1">Nombre del Equipo</label>
+                  <input type="text" name="name" required 
+                         class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
+                         placeholder="T1">
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-400 mb-1">Región</label>
+                  <input type="text" name="region" required 
+                         class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
+                         placeholder="LCK">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm text-gray-400 mb-1">Victorias</label>
+                    <input type="number" name="wins" required min="0" value="0"
+                           class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none">
+                  </div>
+                  <div>
+                    <label class="block text-sm text-gray-400 mb-1">Derrotas</label>
+                    <input type="number" name="losses" required min="0" value="0"
+                           class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none">
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-400 mb-1">KDA Promedio</label>
+                  <input type="number" name="avg_kda" step="0.01" required min="0" value="0"
+                         class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none">
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-400 mb-1">Campeones Favoritos</label>
+                  <input type="text" name="favorite_champions"
+                         class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
+                         placeholder="Azir, Lee Sin, Jinx">
+                </div>
+                <button type="submit" 
+                        class="w-full bg-primary hover:bg-opacity-90 text-white font-bold py-3 rounded-lg transition">
+                  <i class="fas fa-plus mr-2"></i>Crear Equipo
+                </button>
+              </form>
+              <div id="msg-team" class="mt-3 text-sm"></div>
+            </div>
+
+            <!-- FORM: CREAR JUGADOR -->
+            <div class="bg-darker border border-gray-800 rounded-xl p-6">
+              <h3 class="text-xl font-bold mb-4 flex items-center">
+                <i class="fas fa-user-ninja text-primary mr-2"></i>
+                Crear Jugador
+              </h3>
+              <form id="form-player" class="space-y-4">
+                <div>
+                  <label class="block text-sm text-gray-400 mb-1">Nickname</label>
+                  <input type="text" name="nickname" required 
+                         class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
+                         placeholder="Faker">
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-400 mb-1">Nombre Real</label>
+                  <input type="text" name="real_name"
+                         class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
+                         placeholder="Lee Sang-hyeok">
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-400 mb-1">Rol</label>
+                  <select name="role" required 
+                          class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none">
+                    <option value="">Seleccionar rol</option>
+                    <option value="Top">Top</option>
+                    <option value="Jungle">Jungle</option>
+                    <option value="Mid">Mid</option>
+                    <option value="ADC">ADC</option>
+                    <option value="Support">Support</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-400 mb-1">País</label>
+                  <input type="text" name="country"
+                         class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
+                         placeholder="Corea del Sur">
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-400 mb-1">KDA</label>
+                  <input type="number" name="kda" step="0.01" min="0" value="0"
+                         class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none">
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-400 mb-1">ID del Equipo</label>
+                  <input type="number" name="team_id" min="1"
+                         class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
+                         placeholder="1">
+                </div>
+                <button type="submit" 
+                        class="w-full bg-primary hover:bg-opacity-90 text-white font-bold py-3 rounded-lg transition">
+                  <i class="fas fa-plus mr-2"></i>Crear Jugador
+                </button>
+              </form>
+              <div id="msg-player" class="mt-3 text-sm"></div>
+            </div>
+
+            <!-- FORM: CREAR CAMPEÓN -->
+            <div class="bg-darker border border-gray-800 rounded-xl p-6">
+              <h3 class="text-xl font-bold mb-4 flex items-center">
+                <i class="fas fa-users text-primary mr-2"></i>
+                Crear Campeón
+              </h3>
+              <form id="form-champion" class="space-y-4">
+                <div>
+                  <label class="block text-sm text-gray-400 mb-1">Nombre del Campeón</label>
+                  <input type="text" name="name" required 
+                         class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
+                         placeholder="Azir">
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-400 mb-1">Pick Rate</label>
+                  <input type="number" name="pick_rate" step="0.01" required min="0" max="1" value="0"
+                         class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
+                         placeholder="0.45">
+                  <p class="text-xs text-gray-500 mt-1">Valor entre 0 y 1 (ej: 0.45 = 45%)</p>
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-400 mb-1">Ban Rate</label>
+                  <input type="number" name="ban_rate" step="0.01" required min="0" max="1" value="0"
+                         class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
+                         placeholder="0.30">
+                  <p class="text-xs text-gray-500 mt-1">Valor entre 0 y 1 (ej: 0.30 = 30%)</p>
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-400 mb-1">Win Rate</label>
+                  <input type="number" name="win_rate" step="0.01" required min="0" max="1" value="0"
+                         class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
+                         placeholder="0.52">
+                  <p class="text-xs text-gray-500 mt-1">Valor entre 0 y 1 (ej: 0.52 = 52%)</p>
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-400 mb-1">KDA</label>
+                  <input type="number" name="kda" step="0.01" required min="0" value="0"
+                         class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
+                         placeholder="4.5">
+                </div>
+                <button type="submit" 
+                        class="w-full bg-primary hover:bg-opacity-90 text-white font-bold py-3 rounded-lg transition">
+                  <i class="fas fa-plus mr-2"></i>Crear Campeón
+                </button>
+              </form>
+              <div id="msg-champion" class="mt-3 text-sm"></div>
+            </div>
+
+            <!-- FORM: CREAR PARTIDA -->
+            <div class="bg-darker border border-gray-800 rounded-xl p-6">
+              <h3 class="text-xl font-bold mb-4 flex items-center">
+                <i class="fas fa-gamepad text-primary mr-2"></i>
+                Crear Partida
+              </h3>
+              <form id="form-match" class="space-y-4">
+                <div>
+                  <label class="block text-sm text-gray-400 mb-1">Etapa del Torneo</label>
+                  <input type="text" name="stage" required 
+                         class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
+                         placeholder="Final">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm text-gray-400 mb-1">ID Equipo A</label>
+                    <input type="number" name="team_a_id" required min="1"
+                           class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
+                           placeholder="1">
+                  </div>
+                  <div>
+                    <label class="block text-sm text-gray-400 mb-1">ID Equipo B</label>
+                    <input type="number" name="team_b_id" required min="1"
+                           class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
+                           placeholder="2">
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-400 mb-1">ID Ganador</label>
+                  <input type="number" name="winner_id" required min="1"
+                         class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
+                         placeholder="1">
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-400 mb-1">Duración Promedio (minutos)</label>
+                  <input type="number" name="avg_duration_min" step="0.1" required min="0" value="30"
+                         class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary focus:outline-none"
+                         placeholder="32.5">
+                </div>
+                <button type="submit" 
+                        class="w-full bg-primary hover:bg-opacity-90 text-white font-bold py-3 rounded-lg transition">
+                  <i class="fas fa-plus mr-2"></i>Crear Partida
+                </button>
+              </form>
+              <div id="msg-match" class="mt-3 text-sm"></div>
+            </div>
+
+          </div>
+        </section>
+
       </main>
     </div>
   </div>
 
   <script>
-    // Sistema de tabs
+    // Sistema de tabs (sidebar + navbar)
     const menuItems = document.querySelectorAll('.sidebar-menu-item');
+    const navbarLinks = document.querySelectorAll('.navbar-link');
     const tabSections = document.querySelectorAll('.tab-section');
+
+    function switchTab(tabName) {
+      menuItems.forEach(i => i.classList.remove('active'));
+      tabSections.forEach(section => section.classList.remove('active'));
+      
+      const activeMenuItem = document.querySelector(`.sidebar-menu-item[data-tab="${tabName}"]`);
+      if (activeMenuItem) activeMenuItem.classList.add('active');
+      
+      const activeTab = document.getElementById('tab-' + tabName);
+      if (activeTab) activeTab.classList.add('active');
+    }
 
     menuItems.forEach(item => {
       item.addEventListener('click', () => {
         const tabName = item.getAttribute('data-tab');
+        switchTab(tabName);
+      });
+    });
 
-        menuItems.forEach(i => i.classList.remove('active'));
-        item.classList.add('active');
-
-        tabSections.forEach(section => section.classList.remove('active'));
-        document.getElementById('tab-' + tabName).classList.add('active');
+    navbarLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const tabName = link.getAttribute('data-tab');
+        switchTab(tabName);
       });
     });
 
@@ -429,6 +694,206 @@
     document.getElementById('toggle-sidebar').addEventListener('click', () => {
       const sidebar = document.getElementById('sidebar');
       sidebar.classList.toggle('hidden');
+    });
+
+    // === FORM HANDLING ===
+    
+    // Helper: Show message
+    function showMessage(elementId, message, isError = false) {
+      const el = document.getElementById(elementId);
+      el.textContent = message;
+      el.className = `mt-3 text-sm ${isError ? 'text-red-400' : 'text-green-400'}`;
+      setTimeout(() => { el.textContent = ''; }, 5000);
+    }
+
+    // Helper: Parse error message
+    function parseErrorMessage(errorDetail) {
+      if (!errorDetail) return 'Error desconocido';
+      
+      const errorStr = errorDetail.toString();
+      
+      // Error de duplicado - Equipo
+      if (errorStr.includes('ix_team_name') || errorStr.includes('duplicate key') && errorStr.includes('team')) {
+        const match = errorStr.match(/Key \(name\)=\(([^)]+)\)/);
+        const teamName = match ? match[1] : 'este nombre';
+        return `El equipo "${teamName}" ya existe en la base de datos`;
+      }
+      
+      // Error de duplicado - Campeón
+      if (errorStr.includes('ix_champion_name') || errorStr.includes('duplicate key') && errorStr.includes('champion')) {
+        const match = errorStr.match(/Key \(name\)=\(([^)]+)\)/);
+        const champName = match ? match[1] : 'este nombre';
+        return `El campeón "${champName}" ya existe en la base de datos`;
+      }
+      
+      // Error de duplicado - Jugador
+      if (errorStr.includes('ix_player_nickname') || errorStr.includes('duplicate key') && errorStr.includes('player')) {
+        const match = errorStr.match(/Key \(nickname\)=\(([^)]+)\)/);
+        const nickname = match ? match[1] : 'este nickname';
+        return `El jugador "${nickname}" ya existe en la base de datos`;
+      }
+      
+      // Error de clave foránea
+      if (errorStr.includes('ForeignKeyViolation') || errorStr.includes('foreign key')) {
+        if (errorStr.includes('team_id')) {
+          return 'El ID del equipo no existe. Verifica que el equipo esté registrado';
+        }
+        if (errorStr.includes('winner_id')) {
+          return 'El ID del ganador no existe. Verifica que el equipo esté registrado';
+        }
+        return 'Referencia inválida. Verifica que los IDs existan';
+      }
+      
+      // Error de valor nulo
+      if (errorStr.includes('NotNullViolation') || errorStr.includes('null value')) {
+        return 'Faltan datos obligatorios. Completa todos los campos requeridos';
+      }
+      
+      // Error genérico de base de datos
+      if (errorStr.includes('psycopg2') || errorStr.includes('SQL')) {
+        return 'Error al guardar en la base de datos. Verifica los datos ingresados';
+      }
+      
+      // Retornar mensaje original si no coincide con ningún patrón
+      return errorStr.length > 200 ? 'Error al procesar la solicitud' : errorStr;
+    }
+
+    // FORM: Crear Equipo
+    document.getElementById('form-team').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = {
+        name: formData.get('name'),
+        region: formData.get('region'),
+        wins: parseInt(formData.get('wins')),
+        losses: parseInt(formData.get('losses')),
+        avg_kda: parseFloat(formData.get('avg_kda')),
+        favorite_champions: formData.get('favorite_champions') || null
+      };
+
+      try {
+        const response = await fetch('/teams/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          showMessage('msg-team', `✓ Equipo "${result.name}" creado con ID ${result.id}`);
+          e.target.reset();
+          setTimeout(() => location.reload(), 2000);
+        } else {
+          const error = await response.json();
+          const errorMsg = parseErrorMessage(error.detail);
+          showMessage('msg-team', errorMsg, true);
+        }
+      } catch (err) {
+        showMessage('msg-team', `Error de conexión: ${err.message}`, true);
+      }
+    });
+
+    // FORM: Crear Jugador
+    document.getElementById('form-player').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = {
+        nickname: formData.get('nickname'),
+        real_name: formData.get('real_name') || null,
+        role: formData.get('role'),
+        country: formData.get('country') || null,
+        kda: parseFloat(formData.get('kda')),
+        team_id: formData.get('team_id') ? parseInt(formData.get('team_id')) : null
+      };
+
+      try {
+        const response = await fetch('/players/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          showMessage('msg-player', `✓ Jugador "${result.nickname}" creado con ID ${result.id}`);
+          e.target.reset();
+          setTimeout(() => location.reload(), 2000);
+        } else {
+          const error = await response.json();
+          const errorMsg = parseErrorMessage(error.detail);
+          showMessage('msg-player', errorMsg, true);
+        }
+      } catch (err) {
+        showMessage('msg-player', `Error de conexión: ${err.message}`, true);
+      }
+    });
+
+    // FORM: Crear Campeón
+    document.getElementById('form-champion').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = {
+        name: formData.get('name'),
+        pick_rate: parseFloat(formData.get('pick_rate')),
+        ban_rate: parseFloat(formData.get('ban_rate')),
+        win_rate: parseFloat(formData.get('win_rate')),
+        kda: parseFloat(formData.get('kda'))
+      };
+
+      try {
+        const response = await fetch('/champions/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          showMessage('msg-champion', `✓ Campeón "${result.name}" creado con ID ${result.id}`);
+          e.target.reset();
+          setTimeout(() => location.reload(), 2000);
+        } else {
+          const error = await response.json();
+          const errorMsg = parseErrorMessage(error.detail);
+          showMessage('msg-champion', errorMsg, true);
+        }
+      } catch (err) {
+        showMessage('msg-champion', `Error de conexión: ${err.message}`, true);
+      }
+    });
+
+    // FORM: Crear Partida
+    document.getElementById('form-match').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = {
+        stage: formData.get('stage'),
+        team_a_id: parseInt(formData.get('team_a_id')),
+        team_b_id: parseInt(formData.get('team_b_id')),
+        winner_id: parseInt(formData.get('winner_id')),
+        avg_duration_min: parseFloat(formData.get('avg_duration_min'))
+      };
+
+      try {
+        const response = await fetch('/matches/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          showMessage('msg-match', `✓ Partida creada con ID ${result.id}`);
+          e.target.reset();
+          setTimeout(() => location.reload(), 2000);
+        } else {
+          const error = await response.json();
+          const errorMsg = parseErrorMessage(error.detail);
+          showMessage('msg-match', errorMsg, true);
+        }
+      } catch (err) {
+        showMessage('msg-match', `Error de conexión: ${err.message}`, true);
+      }
     });
   </script>
 </body>
