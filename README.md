@@ -285,7 +285,131 @@ uvicorn main:app --reload
 * **IDs autoincrementales:** no son editables por el cliente.
 * **Manejo de errores:** respuestas coherentes (400, 404, 409, 500) con mensajes claros.
 
+## 1. Champions (Campeones)
+## Reglas de creación y actualización:
+
+-Un campeón debe tener un slug único, que lo identifica de forma exclusiva.
+
+-Los campeones tienen atributos como name (nombre), pick_rate (tasa de selección), ban_rate (tasa de prohibición), win_rate (tasa de victoria), y kda (promedio de KDA), los cuales deben ser números.
+
+-Un campeón puede tener múltiples partidas asociadas, que se gestionan a través de la tabla intermedia MatchChampionLink.
+
+-El slug y el name deben ser cadenas no vacías y con un máximo de 100 caracteres.
+
+-El campo is_deleted permite realizar un "soft delete", indicando que el campeón está eliminado sin eliminarlo físicamente de la base de datos.
+
+##Reglas de negocio específicas:
+-Un campeón no puede ser restaurado si no está previamente eliminado (is_deleted=True).
+
+-Los campeones eliminados no aparecerán en los listados de campeones activos.
+
+-Solo los campeones con win_rate >= 0.0 pueden ser listados; no puede haber valores negativos.
+
+## 2. Teams (Equipos)
+## Reglas de creación y actualización:
+
+-Los equipos tienen un name único que los identifica en la base de datos.
+
+-Los equipos también tienen una region (como LCK, LPL, LEC, etc.) y un registro de victorias (wins) y derrotas (losses).
+
+-El avg_kda (promedio de KDA) debe ser un valor numérico, y el favorite_champions es una lista de nombres de campeones (por ejemplo, Ahri, Lee Sin).
+
+-El is_deleted es un campo de "soft delete" para indicar que un equipo ha sido eliminado sin borrarlo realmente.
+
+## Reglas de negocio específicas:
+
+-Un equipo no puede tener un nombre duplicado. Si intentas agregar un equipo con el mismo nombre, debe devolver un error.
+
+-El equipo debe tener al menos un jugador (players), ya que los jugadores están asociados con los equipos.
+
+-El avg_kda debe calcularse automáticamente como el promedio del KDA de los jugadores del equipo.
+-Los equipos eliminados no aparecerán en la lista de equipos activos.
+
+
+## 3. Matches (Partidas)
+## Reglas de creación y actualización:
+
+-Una partida debe asociarse con dos equipos (team_a y team_b) a través de sus IDs.
+
+-La partida también tiene un stage que indica la fase del torneo (Play-ins, Grupos, Cuartos, Semifinales, Finales).
+
+-avg_duration_min (duración promedio en minutos) y avg_kills_per_game (promedio de eliminaciones por juego) son valores numéricos que deben registrarse al momento de crear la partida.
+
+-El winner_id debe coincidir con el ID de uno de los dos equipos (team_a o team_b).
+
+## Reglas de negocio específicas:
+
+-Un equipo no puede ganar una partida si no ha sido uno de los dos equipos participantes (team_a o team_b).
+
+-La duración promedio de la partida y las eliminaciones por juego deben actualizarse si se editan los resultados de una partida.
+
+-Las partidas eliminadas no estarán disponibles en los listados de partidas activas.
+
+-Solo se puede restaurar una partida eliminada si tiene el is_deleted=True.
+
+## 4. Players (Jugadores)
+## Reglas de creación y actualización:
+
+-Los jugadores tienen un nickname único que los identifica en la base de datos.
+
+-Los jugadores tienen un role que define su función dentro del equipo (TOP, JNG, MID, ADC, SUP), y un real_name (nombre real) opcional.
+
+-Cada jugador debe estar asociado con un team_id (ID del equipo) que lo identifica dentro de la base de datos.
+
+-Los jugadores también tienen un country (país de origen).
+
+## Reglas de negocio específicas:
+
+-Los jugadores no pueden ser asignados a más de un equipo a la vez.
+
+-Un jugador no puede ser restaurado si no está previamente eliminado (is_deleted=True).
+
+-Si un jugador no está asignado a un equipo (campo team_id vacío), se mostrará como "Sin equipo" en las vistas.
+
+-Un jugador puede ser eliminado (soft delete) sin eliminar sus datos permanentemente.
+
+## 5. Generalidades (Reglas de interacción entre las entidades)
+## Soft Delete:
+
+-El campo is_deleted se usa para implementar un "soft delete". Esto significa que los registros no se eliminan físicamente de la base de datos, sino que se marcan como eliminados.
+
+-Las operaciones de restauración (restore) solo funcionan para registros que han sido previamente eliminados (is_deleted=True).
+
+## Relaciones:
+
+-Un Team puede tener múltiples Players.
+
+-Un MatchSummary tiene dos equipos: team_a y team_b, y un winner_id que apunta al equipo ganador.
+
+-Los Champions pueden estar relacionados con múltiples MatchSummary a través de la tabla MatchChampionLink.
+
+## 6. Flujos de Trabajo
+## Creación de jugadores, equipos y campeones:
+
+-Los datos se reciben a través de los formularios y se envían a la base de datos utilizando los métodos correspondientes (POST).
+
+-Al crear un nuevo jugador o equipo, se verifica si el nombre o el nickname ya existen en la base de datos antes de realizar la creación.
+
+## Filtrado y búsqueda:
+
+-Se implementan filtros para realizar consultas por nombre, rol o región, y por estadísticas como la tasa de victorias mínima.
+
+-Los filtros y la búsqueda se hacen a través de las rutas adecuadas para cada entidad (GET), permitiendo la visualización de datos específicos.
+
+-Restauración y eliminación de registros:
+
+-Las entidades pueden ser restauradas o eliminadas de manera lógica a través de las rutas adecuadas.
+
+-Las entidades eliminadas no son completamente removidas de la base de datos sino que son marcadas como eliminadas y pueden ser restauradas más tarde.
+
+## 7. Validaciones:
+
+Se validan las entradas de los formularios para asegurarse de que los datos sean correctos antes de insertarlos en la base de datos (por ejemplo, se verifican los valores numéricos de win_rate, pick_rate, avg_kda para los campeones y equipos).
+
+Se verifican las relaciones entre las entidades, asegurándose de que no se intente crear registros con relaciones inconsistentes (por ejemplo, un jugador sin equipo, un equipo sin jugadores).
+
 ---
+
 
 
 
