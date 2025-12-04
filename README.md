@@ -164,11 +164,23 @@ erDiagram
         int champion_id
     }
 
+    PLAYER {
+        int id
+        string nickname
+        string real_name
+        string role
+        string country
+        bool is_deleted
+        int team_id
+    }
+
     TEAM ||--o{ MATCHSUMMARY : team_a
     TEAM ||--o{ MATCHSUMMARY : team_b
     TEAM ||--o{ MATCHSUMMARY : winner
     MATCHSUMMARY ||--o{ MATCHCHAMPIONLINK : includes
     CHAMPION ||--o{ MATCHCHAMPIONLINK : appears
+    TEAM ||--o{ PLAYER : players
+
 ```
 
 > **Nota:** Los rótulos son descriptivos para el diagrama y no afectan el esquema real.
@@ -246,6 +258,22 @@ uvicorn main:app --reload
 | `GET`    | `/matches/search?etapa=Playoffs` | Buscar partidas por etapa              |
 | `GET`    | `/matches/winner/{team_id}`      | Filtrar partidas ganadas por un equipo |
 
+### Players
+
+| Método   | Ruta                              | Descripción                          |
+| -------- | --------------------------------- | ------------------------------------ |
+| `POST`   | `/players/`                       | Crear jugador                        |
+| `GET`    | `/players/`                       | Listar jugadores activos             |
+| `GET`    | `/players/{id}`                   | Obtener jugador por ID               |
+| `PUT`    | `/players/{id}`                   | Actualizar información de un jugador |
+| `DELETE` | `/players/{id}`                   | Eliminar (soft delete)               |
+| `GET`    | `/players/deleted`                | Historial de jugadores eliminados    |
+| `POST`   | `/players/{id}/restore`           | Restaurar jugador eliminado          |
+| `GET`    | `/players/search?nickname={name}` | Buscar jugador por nickname          |
+| `GET`    | `/players/role/{role}`            | Filtrar jugadores por rol            |
+| `GET`    | `/players/team/{team_id}`         | Filtrar jugadores por equipo         |
+
+
 ---
 
 ## Reglas de negocio
@@ -258,4 +286,6 @@ uvicorn main:app --reload
 * **Manejo de errores:** respuestas coherentes (400, 404, 409, 500) con mensajes claros.
 
 ---
+
+
 
