@@ -1,409 +1,402 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>LoL Worlds Dashboard</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LoL Worlds Dashboard</title>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#9146FF',
-                        secondary: '#00C2CB',
-                        accent: '#0096FF',
-                        dark: '#0A0A0A',
-                        darker: '#050505',
-                    },
-                    fontFamily: {
-                        gaming: ['Rajdhani', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                    },
-                },
-            },
-        }
-    </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#9146FF',
+            secondary: '#00C2CB',
+            accent: '#0096FF',
+            dark: '#0A0A0A',
+            darker: '#050505',
+          },
+          fontFamily: {
+            gaming: ['Rajdhani', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
 
-    <link rel="stylesheet" href="/static/styles.css">
-
+  <style>
+    .sidebar-menu-item {
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    .sidebar-menu-item:hover {
+      background: rgba(145, 70, 255, 0.1);
+      border-left: 3px solid #9146FF;
+    }
+    .sidebar-menu-item.active {
+      background: rgba(145, 70, 255, 0.2);
+      border-left: 3px solid #9146FF;
+      color: #9146FF;
+    }
+    .neon-border {
+      box-shadow: 0 0 20px rgba(145, 70, 255, 0.3);
+    }
+    .match-row:hover {
+      background: rgba(145, 70, 255, 0.05);
+    }
+    .tab-section {
+      display: none;
+    }
+    .tab-section.active {
+      display: block;
+    }
+    .filters {
+      background: #050505;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 1rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    .filters label {
+      color: #9CA3AF;
+      font-size: 0.875rem;
+    }
+    .filters input {
+      background: #0A0A0A;
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 0.5rem;
+      color: white;
+      flex: 1;
+    }
+    .filters button {
+      background: #9146FF;
+      color: white;
+      padding: 0.5rem 1.5rem;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    .filters button:hover {
+      background: #7c3ae0;
+    }
+  </style>
 </head>
 <body class="dark bg-dark text-gray-200">
 
-    <div class="flex h-screen overflow-hidden">
-        <aside id="sidebar" class="w-64 bg-darker border-r border-gray-800 flex flex-col">
-            <div class="p-6 border-b border-gray-800">
-                <h1 class="text-2xl font-bold text-white font-gaming">
-                    LoL <span class="text-primary">Worlds</span>
-                </h1>
-                <p class="text-xs text-gray-500 mt-1">FastAPI · PostgreSQL · Render</p>
-            </div>
+  <div class="flex h-screen overflow-hidden">
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="w-64 bg-darker border-r border-gray-800 flex flex-col">
+      <div class="p-6 border-b border-gray-800">
+        <h1 class="text-2xl font-bold text-white font-gaming">
+          LoL <span class="text-primary">Worlds</span>
+        </h1>
+        <p class="text-xs text-gray-500 mt-1">FastAPI · PostgreSQL · Render</p>
+      </div>
 
-            <nav class="flex-1 py-4 overflow-y-auto">
-                <ul>
-                    <li class="sidebar-menu-item active px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="overview">
-                        <i class="fas fa-gauge text-primary"></i>
-                        <span>Resumen</span>
-                    </li>
-                    <li class="sidebar-menu-item px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="champions">
-                        <i class="fas fa-users text-primary"></i>
-                        <span>Campeones</span>
-                    </li>
-                    <li class="sidebar-menu-item px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="teams">
-                        <i class="fas fa-shield-alt text-primary"></i>
-                        <span>Equipos</span>
-                    </li>
-                    <li class="sidebar-menu-item px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="players">
-                        <i class="fas fa-user-ninja text-primary"></i>
-                        <span>Jugadores</span>
-                    </li>
-                    <li class="sidebar-menu-item px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="matches">
-                        <i class="fas fa-gamepad text-primary"></i>
-                        <span>Partidas</span>
-                    </li>
-                </ul>
-            </nav>
+      <nav class="flex-1 py-4 overflow-y-auto">
+        <ul>
+          <li class="sidebar-menu-item active px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="overview">
+            <i class="fas fa-gauge text-primary"></i>
+            <span>Resumen</span>
+          </li>
+          <li class="sidebar-menu-item px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="champions">
+            <i class="fas fa-users text-primary"></i>
+            <span>Campeones</span>
+          </li>
+          <li class="sidebar-menu-item px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="teams">
+            <i class="fas fa-shield-alt text-primary"></i>
+            <span>Equipos</span>
+          </li>
+          <li class="sidebar-menu-item px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="players">
+            <i class="fas fa-user-ninja text-primary"></i>
+            <span>Jugadores</span>
+          </li>
+          <li class="sidebar-menu-item px-6 py-3 flex items-center space-x-3 cursor-pointer" data-tab="matches">
+            <i class="fas fa-gamepad text-primary"></i>
+            <span>Partidas</span>
+          </li>
+        </ul>
+      </nav>
 
-            <div class="p-4 border-t border-gray-800 text-xs text-gray-500">
-                Proyecto académico LoL Worlds<br>
-                <span class="text-primary">v1.0</span>
-            </div>
-        </aside>
+      <div class="p-4 border-t border-gray-800 text-xs text-gray-500">
+        Proyecto académico LoL Worlds<br>
+        <span class="text-primary">v1.0</span>
+      </div>
+    </aside>
 
-        <div class="flex-1 flex flex-col overflow-hidden">
-            <header class="bg-darker py-3 px-6 border-b border-gray-800 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <button id="toggle-sidebar" class="text-gray-400 hover:text-white">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <span class="text-gray-400 text-sm">Worlds 2024 · Dashboard</span>
-                </div>
-                <div class="flex items-center space-x-3 text-xs">
-                    <a href="/docs" target="_blank"
-                        class="px-3 py-1 rounded-full border border-gray-700 hover:border-primary hover:text-primary">
-                        <i class="fas fa-code mr-1"></i> Ver API Docs
-                    </a>
-                </div>
-            </header>
-
-            <main class="flex-1 overflow-y-auto">
-
-                <section id="tab-overview" class="tab-section active p-6 space-y-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-                        <div class="lg:col-span-2 bg-darker border border-gray-800 rounded-xl p-6 neon-border">
-                            <p class="text-xs uppercase tracking-widest text-primary mb-1">Dashboard · Worlds 2024</p>
-                            <h2 class="text-3xl font-bold mb-3">Analítica de equipos, jugadores y campeones</h2>
-                            <p class="text-gray-400 text-sm mb-4">
-                                Esta vista está conectada a tu API de FastAPI con base de datos PostgreSQL en Render.
-                            </p>
-                            <div class="flex flex-wrap gap-3 text-xs">
-                                <span class="px-3 py-1 rounded-full bg-gray-900 border border-gray-700">
-                                    <i class="fas fa-database mr-1 text-primary"></i> Render PostgreSQL
-                                </span>
-                                <span class="px-3 py-1 rounded-full bg-gray-900 border border-gray-700">
-                                    <i class="fas fa-bolt mr-1 text-secondary"></i> FastAPI
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="bg-darker border border-gray-800 rounded-xl p-4">
-                                <p class="text-xs text-gray-400">Teams</p>
-                                <p class="text-3xl font-bold text-secondary">{{ stats.teams }}</p>
-                            </div>
-                            <div class="bg-darker border border-gray-800 rounded-xl p-4">
-                                <p class="text-xs text-gray-400">Players</p>
-                                <p class="text-3xl font-bold text-accent">{{ stats.players }}</p>
-                            </div>
-                            <div class="bg-darker border border-gray-800 rounded-xl p-4">
-                                <p class="text-xs text-gray-400">Champions</p>
-                                <p class="text-3xl font-bold text-primary">{{ stats.champions }}</p>
-                            </div>
-                            <div class="bg-darker border border-gray-800 rounded-xl p-4">
-                                <p class="text-xs text-gray-400">Matches</p>
-                                <p class="text-3xl font-bold text-white">{{ stats.matches }}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                        <div class="bg-darker border border-gray-800 rounded-xl p-4">
-                            <h3 class="text-lg font-bold mb-3">Top Teams</h3>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-sm">
-                                    <thead>
-                                        <tr class="border-b border-gray-700 text-xs text-gray-400">
-                                            <th class="py-2 px-3 text-left">Team</th>
-                                            <th class="py-2 px-3 text-left">Region</th>
-                                            <th class="py-2 px-3 text-left">W/L</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for team in equipos[:10] %}
-                                        <tr class="border-b border-gray-800 match-row">
-                                            <td class="py-2 px-3 font-semibold text-white">{{ team.name }}</td>
-                                            <td class="py-2 px-3 text-gray-300">{{ team.region }}</td>
-                                            <td class="py-2 px-3">
-                                                <span class="text-secondary">{{ team.wins }}W</span> /
-                                                <span class="text-red-400">{{ team.losses }}L</span>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="bg-darker border border-gray-800 rounded-xl p-4">
-                            <h3 class="text-lg font-bold mb-3">Top Players</h3>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-sm">
-                                    <thead>
-                                        <tr class="border-b border-gray-700 text-xs text-gray-400">
-                                            <th class="py-2 px-3 text-left">Nickname</th>
-                                            <th class="py-2 px-3 text-left">Rol</th>
-                                            <th class="py-2 px-3 text-left">Equipo</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for player in jugadores[:10] %}
-                                        <tr class="border-b border-gray-800 match-row">
-                                            <td class="py-2 px-3 font-semibold text-white">{{ player.nickname }}</td>
-                                            <td class="py-2 px-3 text-gray-300">{{ player.role }}</td>
-                                            <td class="py-2 px-3 text-gray-300">
-                                                {% if player.team %}{{ player.team.name }}{% else %}-{% endif %}
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <section id="tab-champions" class="tab-section p-6 space-y-6">
-                    <h1 class="text-3xl font-bold mb-4">Campeones Worlds 2024</h1>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                        <div class="bg-darker border border-gray-800 rounded-xl p-6">
-                            <h3 class="text-xl font-bold text-white">Campeones Totales</h3>
-                            <p class="text-gray-400 text-sm">{{ stats.champions }} campeones registrados</p>
-                        </div>
-                        <div class="bg-darker border border-gray-800 rounded-xl p-6">
-                            <h3 class="text-xl font-bold text-white">Promedio Pick Rate</h3>
-                            <p class="text-gray-400 text-sm">-</p>
-                        </div>
-                        <div class="bg-darker border border-gray-800 rounded-xl p-6">
-                            <h3 class="text-xl font-bold text-white">Promedio Win Rate</h3>
-                            <p class="text-gray-400 text-sm">-</p>
-                        </div>
-                    </div>
-
-                    <div class="bg-darker border border-gray-800 rounded-xl p-6">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm">
-                                <thead>
-                                    <tr class="border-b border-gray-700 text-xs text-gray-400">
-                                        <th class="py-3 px-4 text-left">Nombre</th>
-                                        <th class="py-3 px-4 text-left">Pick Rate</th>
-                                        <th class="py-3 px-4 text-left">Ban Rate</th>
-                                        <th class="py-3 px-4 text-left">Win Rate</th>
-                                        <th class="py-3 px-4 text-left">KDA</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for champion in campeones %}
-                                    <tr class="border-b border-gray-800 match-row">
-                                        <td class="py-3 px-4 font-semibold text-white">{{ champion.name }}</td>
-                                        <td class="py-3 px-4 text-secondary">{{ "%.1f"|format(champion.pick_rate) }}%</td>
-                                        <td class="py-3 px-4 text-red-400">{{ "%.1f"|format(champion.ban_rate) }}%</td>
-                                        <td class="py-3 px-4 text-accent">{{ "%.1f"|format(champion.win_rate) }}%</td>
-                                        <td class="py-3 px-4 text-gray-300">{{ "%.2f"|format(champion.kda) }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-
-                <section id="tab-teams" class="tab-section p-6 space-y-6">
-                    <h1 class="text-3xl font-bold mb-4">Equipos Worlds 2024</h1>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                        <div class="bg-darker border border-gray-800 rounded-xl p-6">
-                            <h3 class="text-xl font-bold text-white">Equipos Totales</h3>
-                            <p class="text-gray-400 text-sm">{{ stats.teams }} equipos registrados</p>
-                        </div>
-                        <div class="bg-darker border border-gray-800 rounded-xl p-6">
-                            <h3 class="text-xl font-bold text-white">Promedio Win Rate</h3>
-                            <p class="text-gray-400 text-sm">-</p>
-                        </div>
-                        <div class="bg-darker border border-gray-800 rounded-xl p-6">
-                            <h3 class="text-xl font-bold text-white">Duración Promedio</h3>
-                            <p class="text-gray-400 text-sm">-</p>
-                        </div>
-                    </div>
-
-                    <div class="bg-darker border border-gray-800 rounded-xl p-6">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm">
-                                <thead>
-                                    <tr class="border-b border-gray-700 text-xs text-gray-400">
-                                        <th class="py-3 px-4 text-left">Equipo</th>
-                                        <th class="py-3 px-4 text-left">Región</th>
-                                        <th class="py-3 px-4 text-left">W/L</th>
-                                        <th class="py-3 px-4 text-left">Win Rate</th>
-                                        <th class="py-3 px-4 text-left">Duración Prom.</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for team in equipos %}
-                                    <tr class="border-b border-gray-800 match-row">
-                                        <td class="py-3 px-4 font-semibold text-white">{{ team.name }}</td>
-                                        <td class="py-3 px-4 text-gray-300">{{ team.region }}</td>
-                                        <td class="py-3 px-4">
-                                            <span class="text-secondary font-bold">{{ team.wins }}W</span>
-                                            <span class="text-gray-500"> / </span>
-                                            <span class="text-red-400 font-bold">{{ team.losses }}L</span>
-                                        </td>
-                                        <td class="py-3 px-4 text-gray-300">{{ "%.1f"|format(team.win_rate) }}%</td>
-                                        <td class="py-3 px-4 text-gray-300">{{ team.avg_duration or 'N/A' }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-
-                <section id="tab-players" class="tab-section p-6 space-y-6">
-                    <h1 class="text-3xl font-bold mb-4">Jugadores Worlds 2024</h1>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                        <div class="bg-darker border border-gray-800 rounded-xl p-6">
-                            <h3 class="text-xl font-bold text-white">Jugadores Totales</h3>
-                            <p class="text-gray-400 text-sm">{{ stats.players }} jugadores registrados</p>
-                        </div>
-                        <div class="bg-darker border border-gray-800 rounded-xl p-6">
-                            <h3 class="text-xl font-bold text-white">Promedio Win Rate</h3>
-                            <p class="text-gray-400 text-sm">-</p>
-                        </div>
-                        <div class="bg-darker border border-gray-800 rounded-xl p-6">
-                            <h3 class="text-xl font-bold text-white">Promedio KDA</h3>
-                            <p class="text-gray-400 text-sm">-</p>
-                        </div>
-                    </div>
-
-                    <div class="bg-darker border border-gray-800 rounded-xl p-6">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm">
-                                <thead>
-                                    <tr class="border-b border-gray-700 text-xs text-gray-400">
-                                        <th class="py-3 px-4 text-left">Nickname</th>
-                                        <th class="py-3 px-4 text-left">Nombre Real</th>
-                                        <th class="py-3 px-4 text-left">Rol</th>
-                                        <th class="py-3 px-4 text-left">País</th>
-                                        <th class="py-3 px-4 text-left">Equipo</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for player in jugadores %}
-                                    <tr class="border-b border-gray-800 match-row">
-                                        <td class="py-3 px-4 font-semibold text-white">{{ player.nickname }}</td>
-                                        <td class="py-3 px-4 text-gray-300">{{ player.real_name or "-" }}</td>
-                                        <td class="py-3 px-4 text-gray-300">{{ player.role }}</td>
-                                        <td class="py-3 px-4 text-gray-300">{{ player.country or "-" }}</td>
-                                        <td class="py-3 px-4 text-gray-300">
-                                            {% if player.team %}{{ player.team.name }}{% else %}-{% endif %}
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-
-                <section id="tab-matches" class="tab-section p-6 space-y-6">
-                    <h1 class="text-3xl font-bold mb-4">Partidas Worlds 2024</h1>
-
-                    <div class="bg-darker border border-gray-800 rounded-xl p-6">
-                        <h3 class="text-lg font-bold mb-4">Historial de Matches</h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm">
-                                <thead>
-                                    <tr class="border-b border-gray-700 text-xs text-gray-400">
-                                        <th class="py-3 px-4 text-left">Match ID</th>
-                                        <th class="py-3 px-4 text-left">Fecha</th>
-                                        <th class="py-3 px-4 text-left">Etapa</th>
-                                        <th class="py-3 px-4 text-left">Equipo 1</th>
-                                        <th class="py-3 px-4 text-left">Equipo 2</th>
-                                        <th class="py-3 px-4 text-center">Ganador</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for match in matches %}
-                                    <tr class="border-b border-gray-800 match-row">
-                                        <td class="py-3 px-4 font-mono text-gray-500">#{{ match.id }}</td>
-                                        <td class="py-3 px-4 text-gray-300">{{ match.match_date or 'N/A' }}</td>
-                                        <td class="py-3 px-4 text-secondary">{{ match.stage or 'Fase Desconocida' }}</td>
-                                        <td class="py-3 px-4 font-semibold text-white">
-                                            {{ match.team1.name if match.team1 else match.team1_id }}
-                                        </td>
-                                        <td class="py-3 px-4 font-semibold text-white">
-                                            {{ match.team2.name if match.team2 else match.team2_id }}
-                                        </td>
-                                        <td class="py-3 px-4 text-center">
-                                            <span class="text-xs text-primary border border-primary/30 bg-primary/10 px-2 py-1 rounded">
-                                                {{ match.winner.name if match.winner else match.winner_team_id }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-
-            </main>
+    <!-- CONTENIDO -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <!-- TOPBAR -->
+      <header class="bg-darker py-3 px-6 border-b border-gray-800 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <button id="toggle-sidebar" class="text-gray-400 hover:text-white">
+            <i class="fas fa-bars"></i>
+          </button>
+          <span class="text-gray-400 text-sm">Worlds 2024 · Dashboard</span>
         </div>
+        <div class="flex items-center space-x-3 text-xs">
+          <a href="/docs" target="_blank"
+             class="px-3 py-1 rounded-full border border-gray-700 hover:border-primary hover:text-primary">
+            <i class="fas fa-code mr-1"></i> Ver API Docs
+          </a>
+        </div>
+      </header>
+
+      <!-- TABS -->
+      <main class="flex-1 overflow-y-auto">
+
+        <!-- TAB: RESUMEN -->
+        <section id="tab-overview" class="tab-section active p-6 space-y-6">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+            <div class="lg:col-span-2 bg-darker border border-gray-800 rounded-xl p-6 neon-border">
+              <p class="text-xs uppercase tracking-widest text-primary mb-1">Dashboard · Worlds 2024</p>
+              <h2 class="text-3xl font-bold mb-3">Analítica de equipos, jugadores y campeones</h2>
+              <p class="text-gray-400 text-sm mb-4">
+                Esta vista está conectada a tu API de FastAPI con base de datos PostgreSQL en Render.
+              </p>
+              <div class="flex flex-wrap gap-3 text-xs">
+                <span class="px-3 py-1 rounded-full bg-gray-900 border border-gray-700">
+                  <i class="fas fa-database mr-1 text-primary"></i> Render PostgreSQL
+                </span>
+                <span class="px-3 py-1 rounded-full bg-gray-900 border border-gray-700">
+                  <i class="fas fa-bolt mr-1 text-secondary"></i> FastAPI
+                </span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-darker border border-gray-800 rounded-xl p-4">
+                <p class="text-xs text-gray-400">Teams</p>
+                <p class="text-3xl font-bold text-secondary">{{ stats.teams }}</p>
+              </div>
+              <div class="bg-darker border border-gray-800 rounded-xl p-4">
+                <p class="text-xs text-gray-400">Players</p>
+                <p class="text-3xl font-bold text-accent">{{ stats.players }}</p>
+              </div>
+              <div class="bg-darker border border-gray-800 rounded-xl p-4">
+                <p class="text-xs text-gray-400">Champions</p>
+                <p class="text-3xl font-bold text-primary">{{ stats.champions }}</p>
+              </div>
+              <div class="bg-darker border border-gray-800 rounded-xl p-4">
+                <p class="text-xs text-gray-400">Matches</p>
+                <p class="text-3xl font-bold text-white">{{ stats.matches }}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB: CAMPEONES -->
+        <section id="tab-champions" class="tab-section p-6 space-y-6">
+          <h1 class="text-3xl font-bold mb-4">Campeones Worlds 2024</h1>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div class="bg-darker border border-gray-800 rounded-xl p-6">
+              <h3 class="text-xl font-bold text-white">Campeones Totales</h3>
+              <p class="text-gray-400 text-sm">{{ stats.champions }} campeones registrados</p>
+            </div>
+            <div class="bg-darker border border-gray-800 rounded-xl p-6">
+              <h3 class="text-xl font-bold text-white">Promedio Pick Rate</h3>
+              <p class="text-gray-400 text-sm">-</p>
+            </div>
+            <div class="bg-darker border border-gray-800 rounded-xl p-6">
+              <h3 class="text-xl font-bold text-white">Promedio Win Rate</h3>
+              <p class="text-gray-400 text-sm">-</p>
+            </div>
+          </div>
+
+          <div class="bg-darker border border-gray-800 rounded-xl p-6">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b border-gray-700 text-xs text-gray-400">
+                    <th class="py-3 px-4 text-left">Nombre</th>
+                    <th class="py-3 px-4 text-left">Pick Rate</th>
+                    <th class="py-3 px-4 text-left">Ban Rate</th>
+                    <th class="py-3 px-4 text-left">Win Rate</th>
+                    <th class="py-3 px-4 text-left">KDA</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for champion in campeones %}
+                  <tr class="border-b border-gray-800 match-row">
+                    <td class="py-3 px-4 font-semibold text-white">{{ champion.name }}</td>
+                    <td class="py-3 px-4 text-secondary">{{ "%.1f"|format(champion.pick_rate) }}%</td>
+                    <td class="py-3 px-4 text-red-400">{{ "%.1f"|format(champion.ban_rate) }}%</td>
+                    <td class="py-3 px-4 text-accent">{{ "%.1f"|format(champion.win_rate) }}%</td>
+                    <td class="py-3 px-4 text-gray-300">{{ "%.2f"|format(champion.kda) }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB: EQUIPOS -->
+        <section id="tab-teams" class="tab-section p-6 space-y-6">
+          <h1 class="text-3xl font-bold mb-4">Equipos Worlds 2024</h1>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div class="bg-darker border border-gray-800 rounded-xl p-6">
+              <h3 class="text-xl font-bold text-white">Equipos Totales</h3>
+              <p class="text-gray-400 text-sm">{{ stats.teams }} equipos registrados</p>
+            </div>
+            <div class="bg-darker border border-gray-800 rounded-xl p-6">
+              <h3 class="text-xl font-bold text-white">Promedio Win Rate</h3>
+              <p class="text-gray-400 text-sm">-</p>
+            </div>
+            <div class="bg-darker border border-gray-800 rounded-xl p-6">
+              <h3 class="text-xl font-bold text-white">Duración Promedio</h3>
+              <p class="text-gray-400 text-sm">-</p>
+            </div>
+          </div>
+
+          <div class="bg-darker border border-gray-800 rounded-xl p-6">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b border-gray-700 text-xs text-gray-400">
+                    <th class="py-3 px-4 text-left">Equipo</th>
+                    <th class="py-3 px-4 text-left">Región</th>
+                    <th class="py-3 px-4 text-left">W/L</th>
+                    <th class="py-3 px-4 text-left">Win Rate</th>
+                    <th class="py-3 px-4 text-left">Duración Prom.</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for team in equipos %}
+                  <tr class="border-b border-gray-800 match-row">
+                    <td class="py-3 px-4 font-semibold text-white">{{ team.name }}</td>
+                    <td class="py-3 px-4 text-gray-300">{{ team.region }}</td>
+                    <td class="py-3 px-4">
+                      <span class="text-secondary font-bold">{{ team.wins }}W</span>
+                      <span class="text-gray-500"> / </span>
+                      <span class="text-red-400 font-bold">{{ team.losses }}L</span>
+                    </td>
+                    <td class="py-3 px-4 text-gray-300">{{ "%.1f"|format(team.win_rate) }}%</td>
+                    <td class="py-3 px-4 text-gray-300">{{ team.avg_duration }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB: JUGADORES -->
+        <section id="tab-players" class="tab-section p-6 space-y-6">
+          <h1 class="text-3xl font-bold mb-4">Jugadores Worlds 2024</h1>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div class="bg-darker border border-gray-800 rounded-xl p-6">
+              <h3 class="text-xl font-bold text-white">Jugadores Totales</h3>
+              <p class="text-gray-400 text-sm">{{ stats.players }} jugadores registrados</p>
+            </div>
+            <div class="bg-darker border border-gray-800 rounded-xl p-6">
+              <h3 class="text-xl font-bold text-white">Promedio Win Rate</h3>
+              <p class="text-gray-400 text-sm">-</p>
+            </div>
+            <div class="bg-darker border border-gray-800 rounded-xl p-6">
+              <h3 class="text-xl font-bold text-white">Promedio KDA</h3>
+              <p class="text-gray-400 text-sm">-</p>
+            </div>
+          </div>
+
+          <div class="bg-darker border border-gray-800 rounded-xl p-6">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b border-gray-700 text-xs text-gray-400">
+                    <th class="py-3 px-4 text-left">Nickname</th>
+                    <th class="py-3 px-4 text-left">Nombre Real</th>
+                    <th class="py-3 px-4 text-left">Rol</th>
+                    <th class="py-3 px-4 text-left">País</th>
+                    <th class="py-3 px-4 text-left">Equipo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for player in jugadores %}
+                  <tr class="border-b border-gray-800 match-row">
+                    <td class="py-3 px-4 font-semibold text-white">{{ player.nickname }}</td>
+                    <td class="py-3 px-4 text-gray-300">{{ player.real_name or "-" }}</td>
+                    <td class="py-3 px-4 text-gray-300">{{ player.role }}</td>
+                    <td class="py-3 px-4 text-gray-300">{{ player.country or "-" }}</td>
+                    <td class="py-3 px-4 text-gray-300">
+                      {% if player.team %}{{ player.team.name }}{% else %}-{% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB: PARTIDAS -->
+        <section id="tab-matches" class="tab-section p-6 space-y-6">
+          <h1 class="text-3xl font-bold mb-4">Partidas Worlds 2024</h1>
+
+          <div class="bg-darker border border-gray-800 rounded-xl p-6">
+            <h3 class="text-lg font-bold mb-4">Historial de Matches</h3>
+            <div class="space-y-3">
+              {% for match in matches %}
+              <div class="bg-dark border border-gray-700 rounded-lg p-4 hover:border-primary transition">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-4">
+                    <div class="text-sm">
+                      <div class="font-bold text-white">Match #{{ match.id }}</div>
+                      <div class="text-xs text-gray-400">{{ match.stage }}</div>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-xs text-gray-400">Winner Team ID: {{ match.winner_team_id }}</div>
+                    <div class="text-xs text-primary">{{ match.match_date }}</div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </section>
+
+      </main>
     </div>
+  </div>
 
-    <script>
-        // Sistema de tabs para cambiar de sección
-        const menuItems = document.querySelectorAll('.sidebar-menu-item');
-        const tabSections = document.querySelectorAll('.tab-section');
+  <script>
+    // Sistema de tabs
+    const menuItems = document.querySelectorAll('.sidebar-menu-item');
+    const tabSections = document.querySelectorAll('.tab-section');
 
-        menuItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const tabName = item.getAttribute('data-tab');
+    menuItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const tabName = item.getAttribute('data-tab');
 
-                // Remover 'active' de todos los items y secciones
-                menuItems.forEach(i => i.classList.remove('active'));
-                tabSections.forEach(section => section.classList.remove('active'));
+        menuItems.forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
 
-                // Añadir 'active' al item y sección seleccionados
-                item.classList.add('active');
-                document.getElementById('tab-' + tabName).classList.add('active');
-            });
-        });
+        tabSections.forEach(section => section.classList.remove('active'));
+        document.getElementById('tab-' + tabName).classList.add('active');
+      });
+    });
 
-        // Toggle sidebar
-        document.getElementById('toggle-sidebar').addEventListener('click', () => {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('hidden');
-        });
-    </script>
+    // Toggle sidebar
+    document.getElementById('toggle-sidebar').addEventListener('click', () => {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('hidden');
+    });
+  </script>
 </body>
 </html>
